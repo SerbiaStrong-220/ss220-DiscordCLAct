@@ -139,7 +139,7 @@ function ExtractAuthors(text){
     const authorInLineRegex = /\w+/g;
 
     let authorLine = authorsLineRegex.exec(text)[0].trim();
-    var authorInLineMathes = authorInLineRegex.exec(authorLine);
+    let authorInLineMathes = authorInLineRegex.exec(authorLine);
     if (authorInLineMathes === null) return null;
 
     let authorsArray = new Array();
@@ -155,21 +155,15 @@ function ExtractAuthors(text){
 function ExtractInfoLines(text){
     const infoLineRegex = /^-.*\w+:.*$/gm;
 
-    let infoLinesArray = infoLineRegex.exec(text);
-    // let i = 0;
-    // let infoLineMatches;
-    // while(infoLineMatches = infoLineRegex.exec(clStr) !== null){
-    //    if (infoLineMatches.index === infoLineRegex.lastIndex){
-    //        infoLineRegex.lastIndex++;
-    //    }
+    let infoLineMatches = infoLineRegex.exec(text);
+    if (infoLineMatches === null) return null;
 
-    //    infoLineMatches.forEach((match) =>{
-    //        infoLinesArray[i] = match;
-    //        i++
-    //    })
-
-    //    console.log(`${infoLinesArray[i]}`)
-    //}
+    let infoLinesArray = new Array();
+    let i = 0;
+    infoLineMatches.forEach((match) =>{
+        infoLinesArray[i] = match;
+        i++
+    })
 
     console.log(`${infoLinesArray[0]}`);
     console.log(`${infoLinesArray[1]}`);
