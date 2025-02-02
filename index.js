@@ -105,6 +105,7 @@ function TrySendMessage(text, author){
         console.info(`Output info:\n${info}\n`)
         Hook.setPayload({'embeds': [{
                 "color": 14397510,
+                "timestamp": GetJSONCurrentDate(),
                 'fields': [{
                 'name': authors,
                 'value': info
@@ -176,4 +177,12 @@ function ExtractInfoLines(text){
     }
 
     return infoLinesArray;
+}
+
+function GetJSONCurrentDate(){
+    let UTCTime = new Date().getTime();
+    let MoscowTime = new Date(UTCTime + (3 * 60 * 60 * 1000));
+
+    let JSONDate = new Date(MoscowTime).toJSON();
+    return JSONDate;
 }
