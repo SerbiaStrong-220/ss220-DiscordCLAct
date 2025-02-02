@@ -156,15 +156,13 @@ function ExtractAuthors(text){
 function ExtractInfoLines(text){
     const infoLineRegex = /^-.*\w+:.*$/gm;
 
-    let infoLineMatches = infoLineRegex.exec(text);
-    if (infoLineMatches === null) return null;
-
     let infoLinesArray = new Array();
     let i = 0;
-    infoLineMatches.forEach((match) =>{
-        infoLinesArray[i] = match;
-        i++
-    })
+    let infoLineMatches;
+    while(infoLineMatches = infoLineRegex.exec(text) !== null){
+        infoLinesArray[i] = infoLineMatches[0];
+        i++;
+    }
 
     console.log(`${infoLinesArray[0]}`);
     console.log(`${infoLinesArray[1]}`);
