@@ -58,6 +58,7 @@ function TrySendMessage(text, author){
             }
         }
 
+        console.log(`${authorsString}`);
         let infoArray = ExtractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
             console.info(`Doesn't found any info line`)
