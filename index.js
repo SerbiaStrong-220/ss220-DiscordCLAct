@@ -1,15 +1,15 @@
-const { Octokit } = require('octokit');
-const core = require('@actions/core');
-const github = require('@actions/github');
-const { EmbedBuilder, WebhookClient } = require('discord.js');
+import { Octokit } from 'octokit';
+import { getInput, setFailed } from '@actions/core';
+import github from '@actions/github';
+import { EmbedBuilder, WebhookClient } from 'discord.js';
 
-const webhook_id = core.getInput('webhook_id');
-const webhook_token = core.getInput('webhook_token');
+const webhook_id = getInput('webhook_id');
+const webhook_token = getInput('webhook_token');
 
-const owner = core.getInput('owner');
-const repo = core.getInput('repo');
-const pull_number = core.getInput('pull_number');
-const token = core.getInput('github_token');
+const owner = getInput('owner');
+const repo = getInput('repo');
+const pull_number = getInput('pull_number');
+const token = getInput('github_token');
 
 const octokit = new Octokit({auth:token});
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
@@ -28,13 +28,13 @@ try {
         pull_number: pull_number
     });
 } catch (error){
-    core.setFailed(error.message);
+    setFailed(error.message);
 }
 
 try {
     TrySendMessage(pull_request.data.body, pull_request.data.user.login);
 } catch (error) {
-    core.setFailed(error.message);
+    setFailed(error.message);
 }
 
 function TrySendMessage(text, author){
