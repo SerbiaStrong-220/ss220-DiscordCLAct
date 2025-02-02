@@ -41,24 +41,30 @@ function TrySendMessage(text, author){
     }
 
     for (clStr of clStrings){
-        let authorsString = "Nothing";
+        let authors = "";
         let authorsArray = ExtractAuthors(clStr);
-        if (authorsArray === null || authorsArray.length <= 0){
-            authorsString = `Автор: ${author}`;
-        } else if (authorsArray.length === 1){
-            authorsString = `Автор: ${authorsArray[0]}`;
+
+        if (authorsArray.length <= 0){
+            console.info(`Doesn't found authors in CL, the user's login will be used instead.`)
         } else{
-            authorsString = `Авторы:`
+            console.info(`Found ${authorsArray.length} authors specified in the changelog`)
+        }
+
+        if (authorsArray === null || authorsArray.length <= 0){
+            authors = `Автор: ${author}`;
+        } else if (authorsArray.length === 1){
+            authors = `Автор: ${authorsArray[0]}`;
+        } else{
+            authors = `Авторы:`
             for (let i = 0; i < authorsArray.length; i++){
                 if (i !== authorsArray.length - 1){
-                    authorsString += ` ${authorsArray[i]},`
+                    authors += ` ${authorsArray[i]},`
                 } else{
-                    authorsString += ` ${authorsArray[i]}`
+                    authors += ` ${authorsArray[i]}`
                 }
             }
         }
 
-        console.log(`${authorsString}`);
         let infoArray = ExtractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
             console.info(`Doesn't found any info line`)
@@ -66,7 +72,7 @@ function TrySendMessage(text, author){
         }
 
         console.info(`Found ${infoArray.length} info lines`)
-        let infoText = "";
+        let info = "";
         for (let i = 0; i < infoArray.length; i++){
             let curInfo = infoArray[i];
 
@@ -82,25 +88,26 @@ function TrySendMessage(text, author){
                 curInfo = curInfo.replaceAll(key, value);
             }
 
-            console.info(`${curInfo}`);
             if (i != infoArray.length - 1){
-                infoText += curInfo + "\n";
+                info += curInfo + "\n";
             }
             else{
-                infoText += curInfo;
+                info += curInfo;
             }
         }
 
-        if (infoText === ""){
+        if (info === ""){
             console.error(`Failed to generate the final info string`)
             continue;
         }
 
+        console.info(`Output authors:${authors}\n`);
+        console.info(`Output info:\n${info}\n`)
         Hook.setPayload({'embeds': [{
                 "color": 14397510,
                 'fields': [{
-                'name': authorsString,
-                'value': infoText
+                'name': authors,
+                'value': info
                 }]
             }]})
             .fire()
