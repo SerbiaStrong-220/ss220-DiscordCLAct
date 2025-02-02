@@ -159,7 +159,7 @@ function ExtractInfoLines(text){
     let infoLinesArray = new Array();
     let i = 0;
     let infoLineMatches;
-    while(infoLineMatches = infoLineRegex.exec(text) !== null){
+    while(infoLineMatches = infoLineRegex.exec(text)){
         infoLinesArray[i] = infoLineMatches[0];
         i++;
     }
