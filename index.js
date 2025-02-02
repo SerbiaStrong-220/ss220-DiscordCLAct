@@ -21,11 +21,15 @@ const ReplaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
-const pull_request = await octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
-    owner: owner,
-    repo: repo,
-    pull_number: pull_number
-});
+try {
+    var pull_request = await octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+        owner: owner,
+        repo: repo,
+        pull_number: pull_number
+    });
+} catch (error){
+    core.setFailed(error.message);
+}
 
 try {
     TrySendMessage(pull_request.data.body, pull_request.data.user.login);
