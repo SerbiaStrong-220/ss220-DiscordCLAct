@@ -119,11 +119,10 @@ function TrySendMessage(text, author){
 
     let imageURL = ExtractImageURL(text);
     if (imageURL !== null){
-        embed.setImage()
+        embed.setImage(imageURL);
     }
 
     webhookClient.send({
-        files: [imageURL, imageURL],
         embeds: [embed],
     });
 }
