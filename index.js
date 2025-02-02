@@ -42,8 +42,9 @@ async function TrySendMessage(){
 
     var author = pull_request.data.user.login;
 
+    let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
     var embed = new EmbedBuilder().setColor(0x3CB371)
-        .setTitle(pull_request.data.title)
+        .setTitle(title)
         .setURL(pull_request.data.html_url);
 
     var clStrings = ExtractCL(text);
