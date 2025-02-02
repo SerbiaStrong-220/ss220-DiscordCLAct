@@ -22,7 +22,7 @@ const ReplaceData = new Map([
 ]);
 
 try {
-    var pull_request = await octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+    var pull_request = octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
         pull_number: pull_number
