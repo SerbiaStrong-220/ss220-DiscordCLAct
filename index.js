@@ -167,6 +167,8 @@ function ExtractInfoLines(text){
             infoLinesArray[i] = match;
             i++
         })
+
+        console.log(`${infoLinesArray[i]}`)
     }
 
     return infoLinesArray;
