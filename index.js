@@ -42,8 +42,7 @@ function TrySendMessage(text, author){
     }
 
     let embed = new EmbedBuilder()
-            .setColor(0x3CB371)
-            .setTimestamp(Date.now());
+            .setColor(0x3CB371);
 
     for (clStr of clStrings){
         let authors = "";
