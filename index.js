@@ -21,21 +21,24 @@ const ReplaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
-try {
-    var pull_request = octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+var embed = new EmbedBuilder();
+(async () => {
+    const pull_request = await octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
         pull_number: pull_number
     });
-} catch (error){
-    setFailed(error.message);
-}
 
-try {
-    TrySendMessage(pull_request.data.body, pull_request.data.user.login);
-} catch (error) {
-    setFailed(error.message);
-}
+    embed.setColor(0x3CB371)
+        .setTitle(pull_request.data.title)
+        .setURL(pull_request.data.html_url);
+
+    try {
+        TrySendMessage(pull_request.data.body, pull_request.data.user.login);
+    } catch (error) {
+        setFailed(error.message);
+    }
+})
 
 function TrySendMessage(text, author){
     if (typeof text !== 'string'){
@@ -53,11 +56,6 @@ function TrySendMessage(text, author){
         console.info(`Does't found any cl string`);
         return;
     }
-
-    let embed = new EmbedBuilder()
-            .setColor(0x3CB371)
-            .setTitle(pull_request.data.title)
-            .setURL(pull_request.data.html_url);
 
     for (clStr of clStrings){
         let authors = "";
