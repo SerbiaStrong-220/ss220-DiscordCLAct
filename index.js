@@ -41,6 +41,10 @@ function TrySendMessage(text, author){
         return;
     }
 
+    let embed = new EmbedBuilder()
+            .setColor(0x00FFFF)
+            .setTimestamp(Date.now())
+
     for (clStr of clStrings){
         let authors = "";
         let authorsArray = ExtractAuthors(clStr);
@@ -105,22 +109,17 @@ function TrySendMessage(text, author){
         console.info(`\nOutput authors:${authors}\n`);
         console.info(`\nOutput info:\n${info}\n`)
 
-        let embed = new EmbedBuilder()
-            .setColor(0x00FFFF)
-            .setTimestamp(Date.now())
-            .addFields(
-                { name: authors, value: info },
-            );
-
-        if (title !== null && title !== ''){
-            embed.setTitle(title)
-                .setURL(url);
-        }
-
-        webhookClient.send({
-            embeds: [embed],
-        });
+        embed.addFields( { name: authors, value: info } );
     }
+
+    if (title !== null && title !== ''){
+        embed.setTitle(title)
+            .setURL(url);
+    }
+
+    webhookClient.send({
+        embeds: [embed],
+    });
 }
 
 function ExtractCL(text){
