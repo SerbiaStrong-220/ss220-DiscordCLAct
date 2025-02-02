@@ -12,9 +12,9 @@ const url = core.getInput('url');
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
 
 const ReplaceData = new Map([
-    ["add:", ":new:"],
-    ["remove:", ":wastebasket:"],
-    ["tweak:", ":sos::flag_al:"],
+    ["add:", ":newspaper: "],
+    ["remove:", ":scissors:"],
+    ["tweak:", ":gear:"],
     ["fix:", ":tools:"]
 ]);
 
@@ -42,7 +42,7 @@ function TrySendMessage(text, author){
     }
 
     let embed = new EmbedBuilder()
-            .setColor(0x00FFFF)
+            .setColor(0x3CB371)
             .setTimestamp(Date.now());
 
     for (clStr of clStrings){
@@ -188,7 +188,7 @@ function ExtractInfoLines(text){
 }
 
 function ExtractImageURL(text){
-    const imageURLRegex = /(?<=!\[.+\]\().*(?=\))/;
+    const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
 
     return imageURLRegex.exec(text)[0];
 }
