@@ -161,7 +161,7 @@ function ExtractInfoLines(text){
     let infoLinesArray = new Array();
     let i = 0;
     infoLineMatches.forEach((match) => {
-            infoArray[i] = match;
+            infoLinesArray[i] = match;
             i++;
     });
 
