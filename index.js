@@ -160,7 +160,7 @@ function ExtractInfoLines(text){
 
     let infoLinesArray = new Array();
     let i = 0;
-    infoMatches.forEach((match) => {
+    infoLineMatches.forEach((match) => {
             infoArray[i] = match;
             i++;
     });
