@@ -41,9 +41,10 @@ function TrySendMessage(text, author){
         return;
     }
 
+    let embeds = new Array();
     let embed = new EmbedBuilder()
             .setColor(0x00FFFF)
-            .setTimestamp(Date.now())
+            .setTimestamp(Date.now());
 
     for (clStr of clStrings){
         let authors = "";
@@ -117,13 +118,16 @@ function TrySendMessage(text, author){
             .setURL(url);
     }
 
+    embeds[0] = embed;
     let imageURL = ExtractImageURL(text);
-    if (imageURL !== null){
-        embed.setImage(imageURL);
+
+    for (let i = 0; i < 2; i++){
+        let imageEmbed = new EmbedBuilder().setImage(imageURL);
+        embeds[i + 1] = imageEmbed;
     }
 
     webhookClient.send({
-        embeds: [embed],
+        embeds: embeds,
     });
 }
 
