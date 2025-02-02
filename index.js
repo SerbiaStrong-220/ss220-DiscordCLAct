@@ -135,10 +135,10 @@ function ExtractCL(text){
 }
 
 function ExtractAuthors(text){
-    const authorsLineRegex = /(?<=:cl:).*/;
+    const authorsLineRegex = /(?<=:cl:).*/g;
     const authorInLineRegex = /\w+/g;
 
-    let authorLine = authorsLineRegex.exec(text).trim();
+    let authorLine = authorsLineRegex.exec(text)[0].trim();
     var authorInLineMathes = authorInLineRegex.exec(authorLine);
     if (authorInLineMathes === null) return null;
 
