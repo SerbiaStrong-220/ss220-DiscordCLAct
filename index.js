@@ -111,23 +111,27 @@ function TrySendMessage(text, author){
 }
 
 function ExtractCL(text){
+    if (typeof text !== 'string')
+        return null;
+
     const clregex = /^:cl:/gm;
 
-    let clIndexes = Array.from(text.matchAll(clregex));
+    let clMatches = Array.from(text.matchAll(clregex));
+    console.info(`Found ${clMatches.length} changelogs`)
+
     let clStrings = new Array();
+    if (clMatches.length <= 0) return clStrings;
 
-    if (clIndexes.length <= 0) return clStrings;
-
-    if (clIndexes.length === 1){
-        clStrings[0] = text.substring(clIndexes[0].index, text.length - 1);
+    if (clMatches.length === 1){
+        clStrings[0] = text.substring(clMatches[0].index, text.length - 1);
     }
     else{
-        for (let i = 0; i < clIndexes.length; i++){
-            if (i != clIndexes.length - 1){
-                clStrings[i] = text.substring(clIndexes[i].index, clIndexes[i + 1].index);
+        for (let i = 0; i < clMatches.length; i++){
+            if (i != clMatches.length - 1){
+                clStrings[i] = text.substring(clMatches[i].index, clMatches[i + 1].index);
             }
             else{
-                clStrings[i] = text.substring(clIndexes[i].index, text.length - 1);
+                clStrings[i] = text.substring(clMatches[i].index, text.length - 1);
             }
         }
     }
