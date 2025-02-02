@@ -3,11 +3,13 @@ const github = require('@actions/github');
 const { EmbedBuilder, WebhookClient } = require('discord.js');
 
 const webhook_id = core.getInput('webhook_id');
-const webhook_secret = core.getInput('webhook_secret');
+const webhook_token = core.getInput('webhook_token');
 const text = core.getInput('text');
 const author = core.getInput('author');
+const title = core.getInput('title');
+const url = core.getInput('url');
 
-const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_secret });
+const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
 
 const ReplaceData = new Map([
     ["add:", ":new:"],
@@ -100,15 +102,20 @@ function TrySendMessage(text, author){
             continue;
         }
 
-        console.info(`Output authors:${authors}\n`);
-        console.info(`Output info:\n${info}\n`)
+        console.info(`\nOutput authors:${authors}\n`);
+        console.info(`\nOutput info:\n${info}\n`)
 
-        var embed = new EmbedBuilder()
+        let embed = new EmbedBuilder()
             .setColor(0x00FFFF)
             .setTimestamp(Date.now())
             .addFields(
                 { name: authors, value: info },
             );
+
+        if (title !== null && title !== ''){
+            embed.setTitle(title)
+                .setURL(url);
+        }
 
         webhookClient.send({
             embeds: [embed],

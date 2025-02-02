@@ -4,7 +4,7 @@ inputs:
   webhook_id:
     description: 'Id of the discord webhook'
     required: true
-  webhook_secret:
+  webhook_token:
     description: 'The secret of the discord webhook'
     required: true
   text:
@@ -14,6 +14,12 @@ inputs:
   author:
     description: 'The author of this changes (Used unless otherwise specified in the changelog itself.)'
     default: ''
+  title:
+    description: 'The title of sended webhook'
+    default: ''
+  url:
+    description: 'The url of the pull request'
+    required: true
 runs:
   using: 'node20'
   main: 'index.js'
