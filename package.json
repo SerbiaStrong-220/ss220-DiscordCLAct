@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "hookcord": "^2.0.2"
+  },
+  "name": "ss220-discordclact",
+  "version": "1.0.0",
+  "description": "<p align=\"center\"> <img alt=\"Space Station 14\" width=\"350\" height=\"350\" src=\"https://raw.githubusercontent.com/SerbiaStrong-220/space-station-14/master/logo.png\" /></p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SerbiaStrong-220/ss220-DiscordCLAct.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SerbiaStrong-220/ss220-DiscordCLAct/issues"
+  },
+  "homepage": "https://github.com/SerbiaStrong-220/ss220-DiscordCLAct#readme"
+}

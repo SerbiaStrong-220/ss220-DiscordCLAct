@@ -1,0 +1,19 @@
+name: 'Discord changelog action'
+description: 'Extracts the changelog from the text and sends it to Discord'
+inputs:
+  webhook_id:
+    description: 'Id of the discord webhook'
+    required: true
+  webhook_secret:
+    description: 'The secret of the discord webhook'
+    required: true
+  text:
+    description: 'The text from which the changelog needs to be extracted'
+    required: true
+    default: ''
+  author:
+    description: 'The author of this changes (Used unless otherwise specified in the changelog itself.)'
+    default: ''
+runs:
+  using: 'node20'
+  main: 'index.js'
