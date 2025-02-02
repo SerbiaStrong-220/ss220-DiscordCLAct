@@ -180,9 +180,11 @@ function ExtractInfoLines(text){
 }
 
 function GetJSONCurrentDate(){
-    let UTCTime = new Date().getUTCMilliseconds();
-    let MoscowTime = new Date(UTCTime + (3 * 60 * 60 * 1000));
+    let now = new Date;
+    let utc_timestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 
+      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+    let moscow_timestamp = new Date(utc_timestamp + (3 * 60 * 60 * 1000));
 
-    let JSONDate = new Date(MoscowTime).toJSON();
+    let JSONDate = new Date(moscow_timestamp).toJSON();
     return JSONDate;
 }
