@@ -180,7 +180,7 @@ function ExtractInfoLines(text){
 }
 
 function GetJSONCurrentDate(){
-    let UTCTime = new Date().getTime();
+    let UTCTime = new Date().getUTCMilliseconds();
     let MoscowTime = new Date(UTCTime + (3 * 60 * 60 * 1000));
 
     let JSONDate = new Date(MoscowTime).toJSON();
