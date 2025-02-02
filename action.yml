@@ -7,18 +7,17 @@ inputs:
   webhook_token:
     description: 'The secret of the discord webhook'
     required: true
-  text:
-    description: 'The text from which the changelog needs to be extracted'
+  github_token:
+    description: 'Github token'
     required: true
-    default: ''
-  author:
-    description: 'The author of this changes (Used unless otherwise specified in the changelog itself.)'
-    default: ''
-  title:
-    description: 'The title of sended webhook'
-    default: ''
-  url:
-    description: 'The url of the pull request'
+  owner:
+    description: 'Name of the repository owner'
+    required: true
+  repo:
+    description: 'Repository name'
+    required: true
+  pull_number:
+    description: 'The number of the pull request whose changelog needs to be published'
     required: true
 runs:
   using: 'node20'

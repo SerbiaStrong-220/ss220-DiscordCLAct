@@ -3,7 +3,8 @@
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
     "discord.js": "^14.17.3",
-    "hookcord": "^2.0.2"
+    "hookcord": "^2.0.2",
+    "octokit": "^4.1.0"
   },
   "name": "ss220-discordclact",
   "version": "1.0.0",

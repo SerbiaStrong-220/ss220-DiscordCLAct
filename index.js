@@ -1,14 +1,17 @@
+const { Octokit } = require('octokit');
 const core = require('@actions/core');
 const github = require('@actions/github');
 const { EmbedBuilder, WebhookClient } = require('discord.js');
 
 const webhook_id = core.getInput('webhook_id');
 const webhook_token = core.getInput('webhook_token');
-const text = core.getInput('text');
-const author = core.getInput('author');
-const title = core.getInput('title');
-const url = core.getInput('url');
 
+const owner = core.getInput('owner');
+const repo = core.getInput('repo');
+const pull_number = core.getInput('pull_number');
+const token = core.getInput('github_token');
+
+const octokit = new Octokit({auth:token});
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
 
 const ReplaceData = new Map([
@@ -18,8 +21,14 @@ const ReplaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
+const pull_request = await octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+    owner: owner,
+    repo: repo,
+    pull_number: pull_number
+});
+
 try {
-    TrySendMessage(text, author);
+    TrySendMessage(pull_request.data.body, pull_request.data.user.login);
 } catch (error) {
     core.setFailed(error.message);
 }
@@ -42,7 +51,9 @@ function TrySendMessage(text, author){
     }
 
     let embed = new EmbedBuilder()
-            .setColor(0x3CB371);
+            .setColor(0x3CB371)
+            .setTitle(pull_request.data.title)
+            .setURL(pull_request.data.html_url);
 
     for (clStr of clStrings){
         let authors = "";
@@ -109,11 +120,6 @@ function TrySendMessage(text, author){
         console.info(`\nOutput info:\n${info}\n`)
 
         embed.addFields( { name: authors, value: info } );
-    }
-
-    if (title !== null && title !== ''){
-        embed.setTitle(title)
-            .setURL(url);
     }
 
     let imageURL = ExtractImageURL(text);
