@@ -41,7 +41,7 @@ function TrySendMessage(text, author){
     }
 
     for (clStr of clStrings){
-        let authorsString = "";
+        let authorsString = "Nothing";
         let authorsArray = ExtractAuthors(clStr);
         if (authorsArray === null || authorsArray.length <= 0){
             authorsString = `Автор: ${author}`;
