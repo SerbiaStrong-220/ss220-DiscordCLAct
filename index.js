@@ -117,6 +117,11 @@ function TrySendMessage(text, author){
             .setURL(url);
     }
 
+    let imageURL = ExtractImageURL(text);
+    if (imageURL !== null){
+        embed.setImage(imageURL);
+    }
+
     webhookClient.send({
         embeds: [embed],
     });
@@ -180,4 +185,10 @@ function ExtractInfoLines(text){
     }
 
     return infoLinesArray;
+}
+
+function ExtractImageURL(text){
+    const imageURLRegex = /(?<=!\[.+\]\().*(?=\))/;
+
+    return imageURLRegex.exec(text)[0];
 }
