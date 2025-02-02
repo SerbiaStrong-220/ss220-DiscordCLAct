@@ -21,35 +21,25 @@ const ReplaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
-var embed = new EmbedBuilder();
-(async () => {
+try {
+    TrySendMessage();
+} catch (error) {
+    setFailed(error.message);
+}
+
+async function TrySendMessage(){
     const pull_request = await octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
         pull_number: pull_number
     });
 
-    embed.setColor(0x3CB371)
+    var text = pull_request.data.body;
+    var author = pull_request.data.user.login;
+
+    var embed = new EmbedBuilder().setColor(0x3CB371)
         .setTitle(pull_request.data.title)
         .setURL(pull_request.data.html_url);
-
-    try {
-        TrySendMessage(pull_request.data.body, pull_request.data.user.login);
-    } catch (error) {
-        setFailed(error.message);
-    }
-})
-
-function TrySendMessage(text, author){
-    if (typeof text !== 'string'){
-        console.error(`Input text are not string!`);
-        return;
-    }
-
-    if (typeof author !== 'string'){
-        console.error(`Input author are not string!`);
-        return;
-    }
 
     var clStrings = ExtractCL(text);
     if (clStrings.length <= 0){
