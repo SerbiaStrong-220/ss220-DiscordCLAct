@@ -47,7 +47,7 @@ async function TrySendMessage(){
         return;
     }
 
-    for (clStr of clStrings){
+    for (let clStr of clStrings){
         let authors = "";
         let authorsArray = ExtractAuthors(clStr);
 
