@@ -110,7 +110,7 @@ function TrySendMessage(text, author){
 }
 
 function ExtractCL(text){
-    const clregex = /:cl:/g;
+    const clregex = /^:cl:/g;
 
     let clIndexes = Array.from(text.matchAll(clregex));
     let clStrings = new Array();
@@ -160,10 +160,9 @@ function ExtractInfoLines(text){
 
     let infoLinesArray = new Array();
     let i = 0;
-    infoLineMatches.forEach((match) => {
-            infoLinesArray[i] = match;
-            i++;
-    });
+    while(infoLineMatches = infoLineRegex.exec(clStr) !== null){
+        infoLinesArray[i] = infoLineMatches[0];
+    }
 
     return infoLinesArray;
 }
