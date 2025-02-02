@@ -58,7 +58,7 @@ function TrySendMessage(text, author){
             }
         }
 
-        let infoArray = ExtractInfoLines(text);
+        let infoArray = ExtractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
             console.info(`Doesn't found any info line`)
             continue;
@@ -155,7 +155,7 @@ function ExtractAuthors(text){
 function ExtractInfoLines(text){
     const infoLineRegex = /^-.*\w+:.*$/gm;
 
-    let infoLinesArray = infoLineRegex.exec(clStr);
+    let infoLinesArray = infoLineRegex.exec(text);
     // let i = 0;
     // let infoLineMatches;
     // while(infoLineMatches = infoLineRegex.exec(clStr) !== null){
