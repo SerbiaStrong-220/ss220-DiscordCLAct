@@ -82,6 +82,7 @@ function TrySendMessage(text, author){
                 curInfo = curInfo.replaceAll(key, value);
             }
 
+            console.info(`${curInfo}`);
             if (i != infoArray.length - 1){
                 infoText += curInfo + "\n";
             }
