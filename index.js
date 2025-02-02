@@ -111,7 +111,7 @@ function TrySendMessage(text, author){
 }
 
 function ExtractCL(text){
-    const clregex = /^:cl:/g;
+    const clregex = /^:cl:/gm;
 
     let clIndexes = Array.from(text.matchAll(clregex));
     let clStrings = new Array();
