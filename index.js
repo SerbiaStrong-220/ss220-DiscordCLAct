@@ -1,11 +1,14 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const hookcord = require('hookcord');
+const { EmbedBuilder, WebhookClient } = require('discord.js');
 
 const webhook_id = core.getInput('webhook_id');
 const webhook_secret = core.getInput('webhook_secret');
 const text = core.getInput('text');
 const author = core.getInput('author');
+
+const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_secret });
 
 var Hook = new hookcord.Hook()
     .login(webhook_id, webhook_secret);
@@ -103,19 +106,31 @@ function TrySendMessage(text, author){
 
         console.info(`Output authors:${authors}\n`);
         console.info(`Output info:\n${info}\n`)
-        Hook.setPayload({'embeds': [{
-                "color": 14397510,
-                "timestamp": new Date().toISOString(),
-                'fields': [{
-                'name': authors,
-                'value': info
-                }]
-            }]})
-            .fire()
-            .then(response_object => {})
-            .catch(error => {
-                throw error;
+
+        var embed = new EmbedBuilder()
+            .setColor(0x00FFFF)
+            .setTimestamp(Date.now())
+            .addFields(
+                { name: authors, value: info },
+            );
+
+        webhookClient.send({
+            embeds: [embed],
         });
+
+        // Hook.setPayload({'embeds': [{
+        //        "color": 14397510,
+        //        "timestamp": new Date().toISOString(),
+        //        'fields': [{
+        //        'name': authors,
+        //        'value': info
+        //        }]
+        //    }]})
+        //    .fire()
+        //    .then(response_object => {})
+        //    .catch(error => {
+        //        throw error;
+        //});
     }
 }
 
