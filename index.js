@@ -35,6 +35,11 @@ async function TrySendMessage(){
     });
 
     var text = pull_request.data.body;
+    if (text === null){
+        console.info(`Pull request body is empty. Nothing to extract`);
+        return;
+    }
+
     var author = pull_request.data.user.login;
 
     var embed = new EmbedBuilder().setColor(0x3CB371)
@@ -43,7 +48,7 @@ async function TrySendMessage(){
 
     var clStrings = ExtractCL(text);
     if (clStrings.length <= 0){
-        console.info(`Does't found any cl string`);
+        console.info(`Doesn't found any cl string`);
         return;
     }
 
@@ -125,9 +130,6 @@ async function TrySendMessage(){
 }
 
 function ExtractCL(text){
-    if (typeof text !== 'string')
-        return null;
-
     const clregex = /^:cl:/gm;
 
     let clMatches = Array.from(text.matchAll(clregex));
