@@ -121,13 +121,11 @@ function TrySendMessage(text, author){
     embeds[0] = embed;
     let imageURL = ExtractImageURL(text);
 
-    for (let i = 0; i < 2; i++){
-        let imageEmbed = new EmbedBuilder().setImage(imageURL);
-        embeds[i + 1] = imageEmbed;
-    }
+    let imageEmbed1 = new EmbedBuilder().setImage(imageURL);
+    let imageEmbed2 = new EmbedBuilder().setImage(imageURL);
 
     webhookClient.send({
-        embeds: embeds,
+        embeds: [embed, imageEmbed1, imageEmbed2],
     });
 }
 
