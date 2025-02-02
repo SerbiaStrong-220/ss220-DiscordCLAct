@@ -14,7 +14,7 @@ const token = getInput('github_token');
 const octokitClient = new Octokit({auth:token});
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
 
-const ReplaceData = new Map([
+const replaceData = new Map([
     ["add:", ":newspaper: "],
     ["remove:", ":scissors:"],
     ["tweak:", ":gear:"],
@@ -22,12 +22,12 @@ const ReplaceData = new Map([
 ]);
 
 try {
-    TrySendMessage();
+    trySendMessage();
 } catch (error) {
     setFailed(error.message);
 }
 
-async function TrySendMessage(){
+async function trySendMessage(){
     const pull_request = await octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
@@ -47,7 +47,7 @@ async function TrySendMessage(){
         .setTitle(title)
         .setURL(pull_request.data.html_url);
 
-    var clStrings = ExtractCL(text);
+    var clStrings = extractCL(text);
     if (clStrings.length <= 0){
         console.info(`Doesn't found any cl string`);
         return;
@@ -55,7 +55,7 @@ async function TrySendMessage(){
 
     for (let clStr of clStrings){
         let authors = "";
-        let authorsArray = ExtractAuthors(clStr);
+        let authorsArray = extractAuthors(clStr);
 
         if (authorsArray.length <= 0){
             console.info(`Doesn't found authors in CL, the user's login will be used instead.`)
@@ -78,7 +78,7 @@ async function TrySendMessage(){
             }
         }
 
-        let infoArray = ExtractInfoLines(clStr);
+        let infoArray = extractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
             console.info(`Doesn't found any info line`)
             continue;
@@ -97,7 +97,7 @@ async function TrySendMessage(){
             const dashRegex = /.*\s(?=\w+:)/g;
 
             curInfo = curInfo.replaceAll(dashRegex, "");
-            for (let [key, value] of ReplaceData){
+            for (let [key, value] of replaceData){
                 curInfo = curInfo.replaceAll(key, value);
             }
 
@@ -120,7 +120,7 @@ async function TrySendMessage(){
         embed.addFields( { name: authors, value: info } );
     }
 
-    let imageURL = ExtractImageURL(text);
+    let imageURL = extractImageURL(text);
     if (imageURL !== null){
         embed.setImage(imageURL);
     }
@@ -130,7 +130,7 @@ async function TrySendMessage(){
     });
 }
 
-function ExtractCL(text){
+function extractCL(text){
     const clregex = /^:cl:/gm;
 
     let clMatches = Array.from(text.matchAll(clregex));
@@ -156,7 +156,7 @@ function ExtractCL(text){
     return clStrings;
 }
 
-function ExtractAuthors(text){
+function extractAuthors(text){
     const authorsLineRegex = /(?<=:cl:).*/g;
     const authorInLineRegex = /\w+/g;
 
@@ -173,7 +173,7 @@ function ExtractAuthors(text){
     return authorsArray;
 }
 
-function ExtractInfoLines(text){
+function extractInfoLines(text){
     const infoLineRegex = /^-.*\w+:.*$/gm;
 
     let infoLinesArray = new Array();
@@ -187,7 +187,7 @@ function ExtractInfoLines(text){
     return infoLinesArray;
 }
 
-function ExtractImageURL(text){
+function extractImageURL(text){
     const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
 
     return imageURLRegex.exec(text)[0];
