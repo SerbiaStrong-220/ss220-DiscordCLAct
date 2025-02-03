@@ -41,7 +41,7 @@ async function trySendMessage(){
         return;
     }
 
-    console.info(`Original message:\n${text}`);
+    console.info(`Original message:\n${text}\n`);
 
     let author = pull_request.data.user.login;
     let authorInfoMap = extractAuthorsInfoMap(text, author);
@@ -165,7 +165,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
  * @returns {string[]}
  */
 function extractCL(text){
-    const clregex = /^:cl:/gm;
+    const clregex = /^:cl:|^\uD83C\uDD91/gm;
 
     let clMatches = Array.from(text.matchAll(clregex));
 
