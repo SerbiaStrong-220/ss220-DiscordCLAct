@@ -82,14 +82,17 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
     console.info(`Found ${clStrings.length} changelogs`)
     let authorInfoMap = new Map();
 
+    let clNumber = 0;
     for (let clStr of clStrings){
+        clNumber++;
+
         let authors = "";
         let authorsArray = extractAuthors(clStr);
 
         if (authorsArray.length <= 0){
-            console.info(`Doesn't found authors in CL, the user's login will be used instead.`)
+            console.info(`Doesn't found authors in the CL#${clNumber}, the user's login will be used instead.`)
         } else{
-            console.info(`Found ${authorsArray.length} authors specified in the changelog`)
+            console.info(`Found ${authorsArray.length} authors specified in the CL#${clNumber}`)
         }
 
         if (authorsArray === null || authorsArray.length <= 0){
@@ -109,11 +112,11 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
 
         let infoArray = extractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
-            console.info(`Doesn't found any info string`)
+            console.info(`Doesn't found any info string in the CL#${clNumber}`)
             continue;
         }
 
-        console.info(`Found ${infoArray.length} info strings`)
+        console.info(`Found ${infoArray.length} info strings in the CL#${clNumber}`)
         let info = "";
         for (let i = 0; i < infoArray.length; i++){
             let curInfo = infoArray[i];
@@ -139,7 +142,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
         }
 
         if (info === ""){
-            console.error(`Failed to generate the final info string`)
+            console.error(`Failed to generate the final info string in the CL#${clNumber}`)
             continue;
         }
 
