@@ -146,9 +146,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
             continue;
         }
 
-        console.info(`\nOutput authors of the CL#${clNumber}:${authors}`);
-        console.info(`\nOutput info of the CL#${clNumber}:\n${info}\n`)
-
+        console.info(`Output message of the CL#${clNumber}:\n${authors}\n${info}\n`)
         authorInfoMap.set(authors, info);
     }
 
