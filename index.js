@@ -165,22 +165,20 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
 function extractCL(text){
     const clregex = /^:cl:|^\uD83C\uDD91/gm;
 
+    text = deleteGitComments(text);
+    console.info(`Input text without comments:\n${text}\n`)
+
     let clMatches = Array.from(text.matchAll(clregex));
 
     let clStrings = new Array();
     if (clMatches.length <= 0) return clStrings;
 
-    if (clMatches.length === 1){
-        clStrings[0] = text.substring(clMatches[0].index, text.length - 1);
-    }
-    else{
-        for (let i = 0; i < clMatches.length; i++){
-            if (i != clMatches.length - 1){
-                clStrings[i] = text.substring(clMatches[i].index, clMatches[i + 1].index);
-            }
-            else{
-                clStrings[i] = text.substring(clMatches[i].index, text.length - 1);
-            }
+    for (let i = 0; i < clMatches.length; i++){
+        if (i != clMatches.length - 1){
+            clStrings[i] = text.substring(clMatches[i].index, clMatches[i + 1].index);
+        }
+        else{
+            clStrings[i] = text.substring(clMatches[i].index, text.length - 1);
         }
     }
 
@@ -241,4 +239,14 @@ function extractImageURL(text){
     if (imageURL === null) return null;
 
     return imageURL[0].trim();
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function deleteGitComments(text){
+    const commentRegex = /<!--(.|\n)*?-->/g;
+
+    return text.replaceAll(commentRegex, '');
 }
