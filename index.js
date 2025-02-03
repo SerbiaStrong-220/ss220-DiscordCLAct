@@ -34,24 +34,53 @@ async function trySendMessage(){
         pull_number: pull_number
     });
 
-    var text = pull_request.data.body;
+    let text = pull_request.data.body;
     if (text === null){
-        console.info(`Pull request body is empty. Nothing to extract`);
+        console.info(`Pull request body is empty, nothing to extract`);
         return;
     }
 
-    var author = pull_request.data.user.login;
+    let author = pull_request.data.user.login;
+    let authorInfoMap = extractAuthorsInfoMap(text, author);
+    if (authorInfoMap === null || authorInfoMap.length <= 0) return;
 
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
-    var embed = new EmbedBuilder().setColor(0x3CB371)
+    let embed = new EmbedBuilder()
+        .setColor(0x3CB371)
         .setTitle(title)
         .setURL(pull_request.data.html_url);
 
+    for (let [key, value] of authorInfoMap){
+        console.info(`\nOutput authors:${key}`);
+        console.info(`\nOutput info:\n${value}\n`)
+
+        embed.addFields( { name: key, value: value } );
+    }
+
+    let imageURL = extractImageURL(text);
+    if (imageURL !== null){
+        embed.setImage(imageURL);
+    }
+
+    webhookClient.send({
+        embeds: [embed],
+    });
+}
+
+/**
+ * @param {string} text
+ * @param {string} author The author of the changes, which will be used unless otherwise specified in the changelog
+ * @returns {Map<string, string> | null} 
+ */
+function extractAuthorsInfoMap(text, author = "Неизвестно"){
     var clStrings = extractCL(text);
     if (clStrings.length <= 0){
-        console.info(`Doesn't found any cl string`);
-        return;
+        console.info(`Doesn't found any changelog`);
+        return null;
     }
+
+    console.info(`Found ${clStrings.length} changelogs`)
+    let authorInfoMap = new Map();
 
     for (let clStr of clStrings){
         let authors = "";
@@ -80,11 +109,11 @@ async function trySendMessage(){
 
         let infoArray = extractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
-            console.info(`Doesn't found any info line`)
+            console.info(`Doesn't found any info string`)
             continue;
         }
 
-        console.info(`Found ${infoArray.length} info lines`)
+        console.info(`Found ${infoArray.length} info strings`)
         let info = "";
         for (let i = 0; i < infoArray.length; i++){
             let curInfo = infoArray[i];
@@ -114,27 +143,25 @@ async function trySendMessage(){
             continue;
         }
 
-        console.info(`\nOutput authors:${authors}\n`);
-        console.info(`\nOutput info:\n${info}\n`)
-
-        embed.addFields( { name: authors, value: info } );
+        authorInfoMap.set(authors, info);
     }
 
-    let imageURL = extractImageURL(text);
-    if (imageURL !== null){
-        embed.setImage(imageURL);
+    if (authorInfoMap.length <= 0){
+        console.info(`Pull request contains :cl:, but after that doesn't contain any info string`);
+        return null;
     }
 
-    webhookClient.send({
-        embeds: [embed],
-    });
+    return authorInfoMap;
 }
 
+/**
+ * @param {string} text
+ * @returns {string[]}
+ */
 function extractCL(text){
     const clregex = /^:cl:/gm;
 
     let clMatches = Array.from(text.matchAll(clregex));
-    console.info(`Found ${clMatches.length} changelogs`)
 
     let clStrings = new Array();
     if (clMatches.length <= 0) return clStrings;
@@ -156,6 +183,11 @@ function extractCL(text){
     return clStrings;
 }
 
+
+/**
+ * @param {string} text 
+ * @returns {string[]}
+ */
 function extractAuthors(text){
     const authorsLineRegex = /(?<=:cl:).*/g;
     const authorInLineRegex = /\w+/g;
@@ -173,6 +205,11 @@ function extractAuthors(text){
     return authorsArray;
 }
 
+/**
+ * 
+ * @param {string} text 
+ * @returns {string[]}
+ */
 function extractInfoLines(text){
     const infoLineRegex = /^-.*\w+:.*$/gm;
 
@@ -187,6 +224,10 @@ function extractInfoLines(text){
     return infoLinesArray;
 }
 
+/**
+ * @param {string} text 
+ * @returns {string}
+ */
 function extractImageURL(text){
     const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
 
