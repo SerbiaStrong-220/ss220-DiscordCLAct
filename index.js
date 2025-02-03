@@ -89,7 +89,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
         let authors = "";
         let authorsArray = extractAuthors(clStr);
 
-        if (authorsArray.length <= 0){
+        if (authorsArray.length <= 0 || authorsArray === null){
             console.info(`Doesn't found authors in the CL#${clNumber}, the user's login will be used instead.`)
         } else{
             console.info(`Found ${authorsArray.length} authors specified in the CL#${clNumber}`)
@@ -189,16 +189,18 @@ function extractCL(text){
     return clStrings;
 }
 
-
 /**
  * @param {string} text 
- * @returns {string[]}
+ * @returns {string[] | null}
  */
 function extractAuthors(text){
-    const authorsLineRegex = /(?<=:cl:).*/g;
+    const authorsLineRegex = /(?<=:cl:).*|(?<=^\uD83C\uDD91).*/g;
     const authorInLineRegex = /\w+/g;
 
-    let authorLine = authorsLineRegex.exec(text)[0].trim();
+    let authorLine = authorsLineRegex.exec(text);
+    if (authorLine === null) return null;
+
+    authorLine = authorLine[0].trim();
 
     let authorsArray = new Array();
     let i = 0;
