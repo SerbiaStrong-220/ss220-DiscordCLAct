@@ -41,6 +41,8 @@ async function trySendMessage(){
         return;
     }
 
+    console.info(`Original message:\n${text}`);
+
     let author = pull_request.data.user.login;
     let authorInfoMap = extractAuthorsInfoMap(text, author);
     if (authorInfoMap === null || authorInfoMap.length <= 0) return;
@@ -73,7 +75,7 @@ async function trySendMessage(){
 function extractAuthorsInfoMap(text, author = "Неизвестно"){
     var clStrings = extractCL(text);
     if (clStrings.length <= 0){
-        console.info(`Doesn't found any changelog\nOriginal message:\n${text}`);
+        console.info(`Doesn't found any changelog`);
         return null;
     }
 
