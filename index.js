@@ -92,7 +92,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
         if (authorsArray.length <= 0 || authorsArray === null){
             console.info(`Doesn't found authors in the CL#${clNumber}, the user's login will be used instead.`)
         } else{
-            console.info(`Found ${authorsArray.length} authors specified in the CL#${clNumber}`)
+            console.info(`Found ${authorsArray.length} authors in the CL#${clNumber}`)
         }
 
         if (authorsArray === null || authorsArray.length <= 0){
