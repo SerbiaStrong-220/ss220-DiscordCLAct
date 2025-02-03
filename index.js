@@ -234,10 +234,13 @@ function extractInfoLines(text){
 
 /**
  * @param {string} text 
- * @returns {string}
+ * @returns {string | null}
  */
 function extractImageURL(text){
     const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
 
-    return imageURLRegex.exec(text)[0];
+    let imageURL = imageURLRegex.exec(text);
+    if (imageURL === null) return null;
+
+    return imageURL[0].trim();
 }
