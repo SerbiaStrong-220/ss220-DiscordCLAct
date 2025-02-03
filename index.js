@@ -73,7 +73,7 @@ async function trySendMessage(){
 function extractAuthorsInfoMap(text, author = "Неизвестно"){
     var clStrings = extractCL(text);
     if (clStrings.length <= 0){
-        console.info(`Doesn't found any changelog`);
+        console.info(`Doesn't found any changelog\nOriginal message:\n${text}`);
         return null;
     }
 
