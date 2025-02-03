@@ -51,9 +51,6 @@ async function trySendMessage(){
         .setURL(pull_request.data.html_url);
 
     for (let [key, value] of authorInfoMap){
-        console.info(`\nOutput authors:${key}`);
-        console.info(`\nOutput info:\n${value}\n`)
-
         embed.addFields( { name: key, value: value } );
     }
 
@@ -145,6 +142,9 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
             console.error(`Failed to generate the final info string in the CL#${clNumber}`)
             continue;
         }
+
+        console.info(`\nOutput authors of the CL#${clNumber}:${authors}`);
+        console.info(`\nOutput info of the CL#${clNumber}:\n${info}\n`)
 
         authorInfoMap.set(authors, info);
     }
