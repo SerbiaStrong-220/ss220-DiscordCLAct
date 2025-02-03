@@ -28,6 +28,7 @@ try {
 }
 
 async function trySendMessage(){
+    console.info(`Attempt to send a GET-request to https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}\n`)
     const pull_request = await octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
