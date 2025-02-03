@@ -41,7 +41,8 @@ async function trySendMessage(){
         return;
     }
 
-    console.info(`Original message:\n${text}\n`);
+    console.info(`Original message:\n${text.trim()}\n`);
+    text = deleteGitComments(text);
 
     let author = pull_request.data.user.login;
     let authorInfoMap = extractAuthorsInfoMap(text, author);
@@ -165,9 +166,6 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
 function extractCL(text){
     const clregex = /^:cl:|^\uD83C\uDD91/gm;
 
-    text = deleteGitComments(text);
-    console.info(`Input text without comments:\n${text}\n`)
-
     let clMatches = Array.from(text.matchAll(clregex));
 
     let clStrings = new Array();
@@ -248,5 +246,5 @@ function extractImageURL(text){
 function deleteGitComments(text){
     const commentRegex = /<!--[\s\S]*?-->/gm;
 
-    return text.replaceAll(commentRegex, '');
+    return text.replaceAll(commentRegex, '').trim();
 }
