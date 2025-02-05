@@ -173,10 +173,10 @@ function extractCL(text){
 
     for (let i = 0; i < clMatches.length; i++){
         if (i != clMatches.length - 1){
-            clStrings[i] = text.substring(clMatches[i].index, clMatches[i + 1].index);
+            clStrings[i] = text.substring(clMatches[i].index, clMatches[i + 1].index - 1);
         }
         else{
-            clStrings[i] = text.substring(clMatches[i].index, text.length - 1);
+            clStrings[i] = text.substring(clMatches[i].index);
         }
     }
 
