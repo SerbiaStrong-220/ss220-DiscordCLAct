@@ -1,17 +1,17 @@
-import { Octokit } from 'octokit';
-import { getInput, setFailed } from '@actions/core';
-import github from '@actions/github';
+import { getInput, setFailed, warning } from '@actions/core';
+import { context, getOctokit } from '@actions/github';
 import { EmbedBuilder, WebhookClient } from 'discord.js';
 
 const webhook_id = getInput('webhook_id');
 const webhook_token = getInput('webhook_token');
+const github_token = getInput('github_token');
 
-const owner = getInput('owner');
-const repo = getInput('repo');
-const pull_number = getInput('pull_number');
-const token = getInput('github_token');
+const [owner, repo] = getInput('repo').split('/');
+const pull_number = getInput('pull_number') === ''
+    ? context.issue.number
+    : parseInt(getInput('pull_number'));
 
-const octokitClient = new Octokit({auth:token});
+const client = getOctokit(github_token);
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });
 
 const replaceData = new Map([
@@ -29,7 +29,7 @@ try {
 
 async function trySendMessage(){
     console.info(`Attempt to send a GET-request to https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}\n`)
-    const pull_request = await octokitClient.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+    const pull_request = await client.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
         repo: repo,
         pull_number: pull_number
@@ -37,7 +37,7 @@ async function trySendMessage(){
 
     let text = pull_request.data.body;
     if (text === null){
-        console.info(`Pull request body is empty, nothing to extract`);
+        warning(`Pull request body is empty, nothing to extract`);
         return;
     }
 
@@ -76,7 +76,7 @@ async function trySendMessage(){
 function extractAuthorsInfoMap(text, author = "Неизвестно"){
     var clStrings = extractCL(text);
     if (clStrings.length <= 0){
-        console.info(`Doesn't found any changelog`);
+        warning(`Doesn't found any changelog`);
         return null;
     }
 
@@ -113,7 +113,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
 
         let infoArray = extractInfoLines(clStr);
         if (infoArray === null || infoArray.length <= 0){
-            console.info(`Doesn't found any info string in the CL#${clNumber}`)
+            warning(`Doesn't found any info string in the CL#${clNumber}`)
             continue;
         }
 
@@ -152,7 +152,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
     }
 
     if (authorInfoMap.length <= 0){
-        console.info(`Pull request contains :cl:, but after that doesn't contain any info string`);
+        warning(`Pull request contains :cl:, but after that doesn't contain any info string`);
         return null;
     }
 
