@@ -252,7 +252,7 @@ function extractImageURL(text){
  * @returns {string}
  */
 function deleteGitComments(text){
-    const commentRegex = /<!--[\s\S]*?-->/gm;
+    const commentRegex = /<!--[\s\S]*?-->|<!--[\s\S]*/gm;
 
     return text.replaceAll(commentRegex, '').trim();
 }
