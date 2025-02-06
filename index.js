@@ -6,18 +6,10 @@ const webhook_id = getInput('webhook_id');
 const webhook_token = getInput('webhook_token');
 const github_token = getInput('github_token');
 
-// New inputs begin
-//const [owner, repo] = getInput('repo').split('/');
-//const pull_number = getInput('pull_number') === ''
-//    ? context.issue.number
-//    : parseInt(getInput('pull_number'));
-// New inputs end
-
-// Obsolete inputs begin
-const owner = getInput('owner');
-const repo = getInput('repo');
-const pull_number = getInput('pull_number');
-// Obsolete inputs end
+const [owner, repo] = getInput('repo').split('/');
+const pull_number = getInput('pull_number') === ''
+    ? context.issue.number
+    : parseInt(getInput('pull_number'));
 
 const client = getOctokit(github_token);
 const webhookClient = new WebhookClient({ id: webhook_id, token: webhook_token });

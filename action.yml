@@ -10,27 +10,14 @@ inputs:
   github_token:
     description:  A github token
     required: false
-    default: ${{ github.token }}
-# Obsolete inputs begin
-  owner:
-    description: 'Name of the repository owner'
-    required: true
+    default: ${{ github.token }} 
   repo:
-    description: 'Repository name'
-    required: true
+    description: Repository name
+    required: false
+    default: ${{ github.repository }}
   pull_number:
-    description: 'The number of the pull request whose changelog needs to be published'
-    required: true
-# Obsolete inputs end
-# New inputs begin 
-#  repo:
-#    description: Repository name
-#    required: false
-#    default: ${{ github.repository }}
-#  pull_number:
-#    description: The number of the pull request whose changelog needs to be published
-#    required: false
-# New inputs end
+    description: The number of the pull request whose changelog needs to be published
+    required: false
 runs:
   using: 'node20'
   main: 'index.js'
