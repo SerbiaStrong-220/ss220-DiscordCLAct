@@ -8,7 +8,7 @@ inputs:
     description: The secret of the discord webhook
     required: true
   github_token:
-    description: Github token
+    description:  A github token
     required: false
     default: ${{ github.token }}
   repo:
