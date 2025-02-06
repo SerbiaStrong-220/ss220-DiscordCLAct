@@ -8,7 +8,7 @@ const github_token = getInput('github_token');
 
 const [owner, repo] = getInput('repo').split('/');
 const pull_number = getInput('pull_number') === ''
-    ? context.payload.pull_request.number
+    ? context.issue.number
     : parseInt(getInput('pull_number'));
 
 const client = getOctokit(github_token);
