@@ -189,21 +189,12 @@ function extractCL(text){
  */
 function extractAuthors(text){
     const authorsLineRegex = /(?<=:cl:).*|(?<=^\uD83C\uDD91).*/g;
-    const authorInLineRegex = /\w+/g;
 
     let authorLine = authorsLineRegex.exec(text);
     if (authorLine === null) return null;
 
     authorLine = authorLine[0].trim();
-
-    let authorsArray = new Array();
-    let i = 0;
-    let authorInLineMathes;
-    while(authorInLineMathes = authorInLineRegex.exec(authorLine)){
-        authorsArray[i] = authorInLineMathes[0];
-        i++
-    }
-
+    let authorsArray = authorLine.split(',');
     return authorsArray;
 }
 
