@@ -96,6 +96,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
             console.info(`Found 1 author in the CL#${clNumber}`)
             authors = `Автор: ${authorsArray[0]}`;
         } else{
+            console.info(`Found ${authorsArray.length} authors in the CL#${clNumber}`)
             authors = `Авторы:`
             for (let i = 0; i < authorsArray.length; i++){
                 if (i !== authorsArray.length - 1){
