@@ -46,7 +46,7 @@ async function trySendMessage(){
 
     let author = pull_request.data.user.login;
     let authorInfoMap = extractAuthorsInfoMap(text, author);
-    if (authorInfoMap === null || authorInfoMap.length <= 0) return;
+    if (authorInfoMap === null || authorInfoMap.size <= 0) return;
 
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
     let embed = new EmbedBuilder()
@@ -89,16 +89,11 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
 
         let authors = "";
         let authorsArray = extractAuthors(clStr);
-
-        if (authorsArray.length <= 0 || authorsArray === null){
-            console.info(`Doesn't found authors in the CL#${clNumber}, the user's login will be used instead.`)
-        } else{
-            console.info(`Found ${authorsArray.length} authors in the CL#${clNumber}`)
-        }
-
         if (authorsArray === null || authorsArray.length <= 0){
+            console.info(`Doesn't found authors in the CL#${clNumber}, the user's login will be used instead.`)
             authors = `Автор: ${author}`;
         } else if (authorsArray.length === 1){
+            console.info(`Found 1 author in the CL#${clNumber}`)
             authors = `Автор: ${authorsArray[0]}`;
         } else{
             authors = `Авторы:`
@@ -127,7 +122,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
                 curInfo === "") 
                 continue;
 
-            const dashRegex = /.*\s(?=\w+:)/g;
+            const dashRegex = /\s*-\s*(?=\w+:)/g;
 
             curInfo = curInfo.replaceAll(dashRegex, "");
             for (let [key, value] of replaceData){
@@ -151,7 +146,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
         authorInfoMap.set(authors, info);
     }
 
-    if (authorInfoMap.length <= 0){
+    if (authorInfoMap.size <= 0){
         warning(`Pull request contains :cl:, but after that doesn't contain any info string`);
         return null;
     }
@@ -194,7 +189,10 @@ function extractAuthors(text){
     if (authorLine === null) return null;
 
     authorLine = authorLine[0].trim();
+    if (authorLine === "") return null;
+    
     let authorsArray = authorLine.split(',');
+    authorsArray.filter(a => a !== "");
     return authorsArray;
 }
 
@@ -204,7 +202,7 @@ function extractAuthors(text){
  * @returns {string[]}
  */
 function extractInfoLines(text){
-    const infoLineRegex = /^-.*\w+:.*$/gm;
+    const infoLineRegex = /\s*-\s*\w+:.*$/gm;
 
     let infoLinesArray = new Array();
     let i = 0;
