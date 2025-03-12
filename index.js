@@ -159,7 +159,7 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
  * @returns {string[]}
  */
 function extractCL(text){
-    const clregex = /^:cl:|^\uD83C\uDD91/gm;
+    const clregex = /(?<=\s*):cl:|(?<=\s*)\uD83C\uDD91/gm;
 
     let clMatches = Array.from(text.matchAll(clregex));
 
