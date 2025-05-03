@@ -50,13 +50,13 @@ async function trySendMessage(){
     if (authorInfoMap === null || authorInfoMap.size <= 0) return;
 
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
-    let generalEmbed = new EmbedBuilder()
+    let mainEmbed = new EmbedBuilder()
         .setColor(0x3CB371)
         .setTitle(title)
         .setURL(pr_url);
 
     for (let [key, value] of authorInfoMap){
-        generalEmbed.addFields( { name: key, value: value } );
+        mainEmbed.addFields( { name: key, value: value } );
     }
 
     let embeds = new Array();
@@ -71,8 +71,8 @@ async function trySendMessage(){
         let i = 0;
         images.forEach(url =>{
             if (i == 0){
-                generalEmbed.setImage(url);
-                embeds[i] = generalEmbed;
+                mainEmbed.setImage(url);
+                embeds[i] = mainEmbed;
             } else if (i < 10){
                 embeds[i] = new EmbedBuilder()
                 .setURL(pr_url)
@@ -82,7 +82,7 @@ async function trySendMessage(){
         })
     }
     else
-        embeds[0] = generalEmbed;
+        embeds[0] = mainEmbed;
 
     webhookClient.send({
         embeds: embeds,
