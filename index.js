@@ -58,6 +58,7 @@ async function trySendMessage(){
         generalEmbed.addFields( { name: key, value: value } );
     }
 
+    let embeds = new Array();
     let images = extractImageURLs(text);
     if (images.length > 0){
         console.info(`Found ${images.length} images`);
@@ -66,7 +67,6 @@ async function trySendMessage(){
             warning(`More than 10 images found, only the first 10 will be sent`);
         }
 
-        let embeds = new Array();
         let i = 0;
         images.forEach(url =>{
             if (i == 0){
@@ -80,6 +80,8 @@ async function trySendMessage(){
             i++;
         })
     }
+    else
+        embeds[0] = generalEmbed;
 
     webhookClient.send({
         embeds: embeds,
