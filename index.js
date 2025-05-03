@@ -242,6 +242,10 @@ function extractImageURLs(text){
     while((result = imageURLRegex.exec(text)) != null){
         imageURLArray[i] = result[0];
         i++;
+
+        console.log(`found ${result[0]}`);
+        if (i > 50)
+            throw new Error(`\nmany iterations\n`);
     }
 
     return imageURLArray;
