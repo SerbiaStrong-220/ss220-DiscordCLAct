@@ -49,22 +49,31 @@ async function trySendMessage(){
     if (authorInfoMap === null || authorInfoMap.size <= 0) return;
 
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
-    let embed = new EmbedBuilder()
+    let generalEmbed = new EmbedBuilder()
         .setColor(0x3CB371)
         .setTitle(title)
         .setURL(pull_request.data.html_url);
 
     for (let [key, value] of authorInfoMap){
-        embed.addFields( { name: key, value: value } );
+        generalEmbed.addFields( { name: key, value: value } );
     }
 
-    let imageURL = extractImageURL(text);
-    if (imageURL !== null){
-        embed.setImage(imageURL);
+    let embeds = new Array();
+    let images = extractImageURLs(text);
+    let i = 0;
+    for (let url of images){
+        if (i == 0){
+            generalEmbed.setImage(url);
+            embeds[i] = generalEmbed;
+        } else if (i < 10){
+            embeds[i] = new EmbedBuilder()
+            .setURL(pull_request.data.html_url)
+            .setImage(url);
+        }
     }
 
     webhookClient.send({
-        embeds: [embed],
+        embeds: embeds,
     });
 }
 
@@ -218,15 +227,19 @@ function extractInfoLines(text){
 
 /**
  * @param {string} text 
- * @returns {string | null}
+ * @returns {string[]}
  */
-function extractImageURL(text){
+function extractImageURLs(text){
     const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
 
-    let imageURL = imageURLRegex.exec(text);
-    if (imageURL === null) return null;
+    let imageURLArray = new Array();
+    let i = 0;
+    while(imageURLMathes = imageURLRegex.exec(text)){
+        imageURLArray[i] = imageURLMathes[0];
+        i++;
+    }
 
-    return imageURL[0].trim();
+    return imageURLArray;
 }
 
 /**
