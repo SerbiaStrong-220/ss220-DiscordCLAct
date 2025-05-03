@@ -216,9 +216,9 @@ function extractInfoLines(text){
 
     let infoLinesArray = new Array();
     let i = 0;
-    let infoLineMatches;
-    while(infoLineMatches = infoLineRegex.exec(text)){
-        infoLinesArray[i] = infoLineMatches[0];
+    let result;
+    while((result = infoLineRegex.exec(text)) != null){
+        infoLinesArray[i] = result[0];
         i++;
     }
 
@@ -234,9 +234,9 @@ function extractImageURLs(text){
 
     let imageURLArray = new Array();
     let i = 0;
-    let imageURLMathes;
-    while(imageURLMathes = imageURLRegex.exec(text)){
-        imageURLArray[i] = imageURLMathes[0];
+    let result;
+    while((result = imageURLRegex.exec(text)) != null){
+        imageURLArray[i] = result[0];
         i++;
     }
 
