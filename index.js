@@ -63,7 +63,7 @@ async function trySendMessage(){
         console.info(`Found ${images.length} images`);
 
         if (images.length > 10){
-            console.warning(`More than 10 images found, only the first 10 will be sent`);
+            warning(`More than 10 images found, only the first 10 will be sent`);
         }
 
         let embeds = new Array();
