@@ -34,6 +34,7 @@ async function trySendMessage(){
         repo: repo,
         pull_number: pull_number
     });
+    const pr_url = pull_request.data.html_url;
 
     let text = pull_request.data.body;
     if (text === null){
@@ -52,7 +53,7 @@ async function trySendMessage(){
     let generalEmbed = new EmbedBuilder()
         .setColor(0x3CB371)
         .setTitle(title)
-        .setURL(pull_request.data.html_url);
+        .setURL(pr_url);
 
     for (let [key, value] of authorInfoMap){
         generalEmbed.addFields( { name: key, value: value } );
@@ -74,7 +75,7 @@ async function trySendMessage(){
                 embeds[i] = generalEmbed;
             } else if (i < 10){
                 embeds[i] = new EmbedBuilder()
-                .setURL(pull_request.data.html_url)
+                .setURL(pr_url)
                 .setImage(url);
             }
             i++;
