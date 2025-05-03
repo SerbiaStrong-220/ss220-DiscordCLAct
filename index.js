@@ -234,6 +234,7 @@ function extractImageURLs(text){
 
     let imageURLArray = new Array();
     let i = 0;
+    let imageURLMathes;
     while(imageURLMathes = imageURLRegex.exec(text)){
         imageURLArray[i] = imageURLMathes[0];
         i++;
