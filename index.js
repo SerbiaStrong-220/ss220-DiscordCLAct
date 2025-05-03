@@ -58,24 +58,29 @@ async function trySendMessage(){
         generalEmbed.addFields( { name: key, value: value } );
     }
 
-    console.log("\nbefore image extract\n");
-    let embeds = new Array();
     let images = extractImageURLs(text);
-    let i = 0;
-    console.log("\nbefore generate embeds array\n");
-    images.forEach(url =>{
-        if (i == 0){
-            generalEmbed.setImage(url);
-            embeds[i] = generalEmbed;
-        } else if (i < 10){
-            embeds[i] = new EmbedBuilder()
-            .setURL(pull_request.data.html_url)
-            .setImage(url);
-        }
-        i++;
-    })
+    if (images.length > 0){
+        console.info(`Found ${images.length} images`);
 
-    console.log("\nbefore send\n");
+        if (images.length > 10){
+            console.warning(`More than 10 images found, only the first 10 will be sent`);
+        }
+
+        let embeds = new Array();
+        let i = 0;
+        images.forEach(url =>{
+            if (i == 0){
+                generalEmbed.setImage(url);
+                embeds[i] = generalEmbed;
+            } else if (i < 20){
+                embeds[i] = new EmbedBuilder()
+                .setURL(pull_request.data.html_url)
+                .setImage(url);
+            }
+            i++;
+        })
+    }
+
     webhookClient.send({
         embeds: embeds,
     });
@@ -242,10 +247,6 @@ function extractImageURLs(text){
     while((result = imageURLRegex.exec(text)) != null){
         imageURLArray[i] = result[0];
         i++;
-
-        console.log(`found ${result[0]}`);
-        if (i > 50)
-            throw new Error(`many iterations`);
     }
 
     return imageURLArray;
