@@ -58,9 +58,11 @@ async function trySendMessage(){
         generalEmbed.addFields( { name: key, value: value } );
     }
 
+    console.log("\nbefore image extract\n");
     let embeds = new Array();
     let images = extractImageURLs(text);
     let i = 0;
+    console.log("\nbefore generate embeds array\n");
     images.forEach(url =>{
         if (i == 0){
             generalEmbed.setImage(url);
@@ -73,6 +75,7 @@ async function trySendMessage(){
         i++;
     })
 
+    console.log("\nbefore send\n");
     webhookClient.send({
         embeds: embeds,
     });
