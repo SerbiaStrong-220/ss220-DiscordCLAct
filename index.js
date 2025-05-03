@@ -234,7 +234,7 @@ function extractInfoLines(text){
  * @returns {string[]}
  */
 function extractImageURLs(text){
-    const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/;
+    const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/gm;
 
     let imageURLArray = new Array();
     let i = 0;
@@ -245,7 +245,7 @@ function extractImageURLs(text){
 
         console.log(`found ${result[0]}`);
         if (i > 50)
-            throw new Error(`\nmany iterations\n`);
+            throw new Error(`many iterations`);
     }
 
     return imageURLArray;
