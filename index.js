@@ -61,7 +61,7 @@ async function trySendMessage(){
     let embeds = new Array();
     let images = extractImageURLs(text);
     let i = 0;
-    for (let url of images){
+    images.forEach(url =>{
         if (i == 0){
             generalEmbed.setImage(url);
             embeds[i] = generalEmbed;
@@ -70,7 +70,8 @@ async function trySendMessage(){
             .setURL(pull_request.data.html_url)
             .setImage(url);
         }
-    }
+        i++;
+    })
 
     webhookClient.send({
         embeds: embeds,
