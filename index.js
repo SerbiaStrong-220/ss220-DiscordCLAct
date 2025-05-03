@@ -72,7 +72,7 @@ async function trySendMessage(){
             if (i == 0){
                 generalEmbed.setImage(url);
                 embeds[i] = generalEmbed;
-            } else if (i < 20){
+            } else if (i < 10){
                 embeds[i] = new EmbedBuilder()
                 .setURL(pull_request.data.html_url)
                 .setImage(url);
