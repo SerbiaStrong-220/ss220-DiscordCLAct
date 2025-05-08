@@ -279,6 +279,7 @@ async function extractMedia(text){
     let result;
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
+        console.log(`Try get file type from ${url}`);
         let xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.onreadystatechange = function() {
