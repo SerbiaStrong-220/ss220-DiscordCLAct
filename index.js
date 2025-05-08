@@ -76,35 +76,12 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((url, type) =>{
             if (i == 0){
-                switch (type){
-                    case "image":
-                        mainEmbed.setImage(url);
-                        break;
-                    case "video":
-                        mainEmbed.data.video = {
-                            proxy_url: url
-                        };
-                        break;
-                    default:
-                        break;
-                }
+                setMediaInEmbed(type, url, mainEmbed);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 let embed = new EmbedBuilder()
-                    .setURL(pr_url);
-
-                switch (type){
-                    case "image":
-                        embed.setImage(url);
-                        break;
-                    case "video":
-                        embed.data.video = {
-                            proxy_url: url
-                        };
-                        break;
-                    default:
-                        break;
-                }
+                .setURL(pr_url);
+                setMediaInEmbed(type, url, embed);
                 embeds[i] = embed;
             }
             i++;
@@ -346,4 +323,26 @@ function getMediaType(contentType){
         warning(`Content type ${contentType} doesn't supported`);
     }
     return type;
+}
+
+/**
+ * @param {string} type
+ * @param {string} url 
+ * @param {EmbedBuilder} embed 
+ */
+function setMediaInEmbed(type, url, embed){
+    switch (type){
+        case "image":
+            embed.setImage(url);
+            break;
+        case "video":
+            embed.data.video ={
+                url = url,
+                height = 300,
+                width = 300
+            }
+            break;
+        default:
+            break;
+    }
 }
