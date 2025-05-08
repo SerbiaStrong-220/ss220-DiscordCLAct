@@ -281,23 +281,31 @@ async function extractMedia(text){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
         let type = getUrlFileType(url);
-        console.log(type);
+        if (type != null){
+            console.log(`type is ${type[Symbol]}`);
+        }
+        else{
+            console.log("type is null");
+        }
     }
 
     return mediaArray;
 }
 
 /**
- * @param {string} text 
- * @returns {string | null}
+ * @param {string} url
+ * @returns {Promise<string> | null}
  */
 async function getUrlFileType(url){
-    await fetch(url)
-        .then(responce =>{
-            if (responce.redirected)
-                return getUrlFileType(responce.url);
-            else{
-                return responce.headers.get('Content-Type');
-            }
-        })
+    var type = null;
+    var responce = await fetch(url);
+    if (responce.redirected){
+        console.log(`redirected, new url is ${responce.url}`);
+        type = await getUrlFileType(responce.url);
+    }
+    else{
+        type = responce.headers.get('Content-Type');
+    }
+    
+    return type;
 }
