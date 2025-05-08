@@ -282,7 +282,7 @@ async function extractMedia(text){
         console.log(`Try get file type from ${url}`);
         let type = await getUrlFileType(url);
         if (type != null){
-            console.log(`type is ${type[Symbol]}`);
+            console.log(`type is ${type}`);
         }
         else{
             console.log("type is null");
