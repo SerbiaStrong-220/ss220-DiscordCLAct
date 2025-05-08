@@ -26,7 +26,6 @@ const supportedMediaTypes = new Map([
     ["video", ["mp4", "webm", "gif"]]
 ])
 
-
 try {
     trySendMessage();
 } catch (error) {
@@ -312,7 +311,7 @@ async function getUrlContentTypeRecursive(url){
  * @returns {string | null>}
  */
 function getMediaType(contentType){
-    supportedMediaTypes.forEach((mediaType, supportedTypes) => {
+    supportedMediaTypes.forEach((supportedTypes, mediaType) => {
         if (supportedTypes.includes(contentType)){
             return mediaType;
         }
