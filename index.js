@@ -76,7 +76,18 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((url, type) =>{
             if (i == 0){
-                setMediaInEmbed(type, url, mainEmbed);
+                switch (type){
+                    case "image":
+                        mainEmbed.setImage(url);
+                        break;
+                    case "video":
+                        mainEmbed.data.video = {
+                            proxy_url: url
+                        };
+                        break;
+                    default:
+                        break;
+                }
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 let embed = new EmbedBuilder()
