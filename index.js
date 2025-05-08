@@ -281,7 +281,7 @@ async function extractMedia(text){
         i++
     }
 
-    return mediaArray;
+    return mediaMap;
 }
 
 /**
