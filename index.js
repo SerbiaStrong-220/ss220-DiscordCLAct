@@ -266,18 +266,18 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        let contentType = await getUrlContentTypeRecursive(url);
-        if (contentType == null){
+        let responce = await getUrlContentTypeRecursive(url);
+        if (responce == null){
             continue;
         }
 
-        let mediaType = getMediaType(contentType);
+        let mediaType = getMediaType(responce.contentType);
         if (mediaType == null){
             continue;
         }
         
         console.log(`media type is ${mediaType}`);
-        mediaMap.set(url, mediaType);
+        mediaMap.set(responce.url, mediaType);
         i++
     }
 
@@ -286,7 +286,7 @@ async function extractMedia(text){
 
 /**
  * @param {string} url
- * @returns {Promise<string | null>}
+ * @returns {Promise<{contentType: string, url: string} | null>}
  */
 async function getUrlContentTypeRecursive(url){
     var type = null;
@@ -298,8 +298,9 @@ async function getUrlContentTypeRecursive(url){
     else{
         type = responce.headers.get('Content-Type');
         if (type != null){
-            type = type.split('/')[1];
-            console.log(`Url content type is ${type}`);
+            let contentType = type.split('/')[1];
+            console.log(`Url content type is ${contentType}`);
+            type = {contentType: contentType, url: url};
         }
     }
     
