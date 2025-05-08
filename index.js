@@ -280,7 +280,8 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        getUrlFileType(url);
+        let type = getUrlFileType(url);
+        console.log(type);
     }
 
     return mediaArray;
