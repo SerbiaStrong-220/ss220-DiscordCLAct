@@ -1,4 +1,4 @@
-import { getInput, setFailed, warning } from '@actions/core';
+import { error, getInput, setFailed, warning } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { EmbedBuilder, WebhookClient } from 'discord.js';
 
@@ -21,10 +21,11 @@ const replaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
-const supportedMediaTypes = [
-    "image",
-    "video"
-];
+const supportedMediaTypes = new Map([
+    ["image", ["jpg", "png"]],
+    ["video", ["mp4", "webm", "gif"]]
+])
+
 
 try {
     trySendMessage();
@@ -66,22 +67,23 @@ async function trySendMessage(){
 
     let embeds = new Array();
     let media = await extractMedia(text);
-    if (media.length > 0){
-        console.info(`Found ${media.length} media`);
-
-        if (media.length > 10){
+    if (media.size > 0){
+        console.info(`Found ${media.size} media`);
+        
+        if (media.size > 10){
             warning(`More than 10 media found, only the first 10 will be sent`);
         }
 
         let i = 0;
-        media.forEach(url =>{
+        media.forEach((type, url) =>{
             if (i == 0){
-                mainEmbed.setImage(url);
+                setMediaInEmbed(type, url, mainEmbed);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
-                embeds[i] = new EmbedBuilder()
-                .setURL(pr_url)
-                .setImage(url);
+                let embed = new EmbedBuilder()
+                .setURL(pr_url);
+                setMediaInEmbed(type, url, embed);
+                embeds[i] = embed;
             }
             i++;
         })
@@ -254,37 +256,32 @@ function deleteGitComments(text){
 
 /**
  * @param {string} text 
- * @returns {Promise<string[]>}
+ * @returns {Promise<Map<string, string>>}
  */
 async function extractMedia(text){
     const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
 
-    let mediaArray = new Array();
+    let mediaMap = new Map();
     let i = 0;
     let result;
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        if (await isMediaSupported(url)){
-            mediaArray[i] = url;
-            i++;
+        let contentType = await getUrlContentTypeRecursive(url);
+        if (contentType == null){
+            continue;
         }
+
+        let mediaType = getMediaType(contentType);
+        if (mediaType == null){
+            continue;
+        }
+
+        mediaMap.set(mediaType, url);
+        i++
     }
 
     return mediaArray;
-}
-
-/**
- * @param {string} url
- * @returns {Promise<bool | null>}
- */
-async function isMediaSupported(url){
-    let type = await getUrlContentTypeRecursive(url);
-    if (type != null){
-        return supportedMediaTypes.includes(type.split('/')[0]);
-    }
-
-    return false;
 }
 
 /**
@@ -300,8 +297,43 @@ async function getUrlContentTypeRecursive(url){
     }
     else{
         type = responce.headers.get('Content-Type');
-        console.log(`Url content type is ${type}`);
+        if (type != null){
+            type = type.split('/')[1];
+            console.log(`Url content type is ${type}`);
+        }
     }
     
     return type;
+}
+
+/**
+ * @param {string} contentType
+ * @returns {string | null>}
+ */
+function getMediaType(contentType){
+    supportedMediaTypes.forEach((mediaType, contentTypes) => {
+        if (contentTypes.includes(contentType)){
+            return mediaType;
+        }
+    })
+
+    return null;
+}
+
+/**
+ * @param {string} type
+ * @param {string} url 
+ * @param {EmbedBuilder} embed 
+ */
+function setMediaInEmbed(type, url, embed){
+    switch (type){
+        case "image":
+            embed.setImage(url);
+            break;
+        case "video":
+            embed.data.video = type;
+            break;
+        default:
+            break;
+    }
 }
