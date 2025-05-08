@@ -265,7 +265,7 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        if (await isMediaSupported(usl)){
+        if (await isMediaSupported(url)){
             mediaArray[i] = url;
             i++;
         }
