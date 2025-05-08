@@ -21,6 +21,11 @@ const replaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
+const supportedMediaTypes = [
+    "image",
+    "video"
+];
+
 try {
     trySendMessage();
 } catch (error) {
@@ -59,19 +64,17 @@ async function trySendMessage(){
         mainEmbed.addFields( { name: key, value: value } );
     }
 
-    extractMedia(text);
-
     let embeds = new Array();
-    let images = extractImageURLs(text);
-    if (images.length > 0){
-        console.info(`Found ${images.length} images`);
+    let media = await extractMedia(text);
+    if (media.length > 0){
+        console.info(`Found ${media.length} media`);
 
-        if (images.length > 10){
-            warning(`More than 10 images found, only the first 10 will be sent`);
+        if (media.length > 10){
+            warning(`More than 10 media found, only the first 10 will be sent`);
         }
 
         let i = 0;
-        images.forEach(url =>{
+        media.forEach(url =>{
             if (i == 0){
                 mainEmbed.setImage(url);
                 embeds[i] = mainEmbed;
@@ -240,24 +243,6 @@ function extractInfoLines(text){
 }
 
 /**
- * @param {string} text 
- * @returns {string[]}
- */
-function extractImageURLs(text){
-    const imageURLRegex = /(?<=!\[[^!].+\]\().*(?=\))/gm;
-
-    let imageURLArray = new Array();
-    let i = 0;
-    let result;
-    while((result = imageURLRegex.exec(text)) != null){
-        imageURLArray[i] = result[0];
-        i++;
-    }
-
-    return imageURLArray;
-}
-
-/**
  * @param {string} text
  * @returns {string}
  */
@@ -269,7 +254,7 @@ function deleteGitComments(text){
 
 /**
  * @param {string} text 
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
 async function extractMedia(text){
     const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
@@ -280,12 +265,9 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        let type = await getUrlFileType(url);
-        if (type != null){
-            console.log(`type is ${type}`);
-        }
-        else{
-            console.log("type is null");
+        if (await isMediaSupported(usl)){
+            mediaArray[i] = url;
+            i++;
         }
     }
 
@@ -294,17 +276,31 @@ async function extractMedia(text){
 
 /**
  * @param {string} url
- * @returns {Promise<string> | null}
+ * @returns {Promise<bool | null>}
  */
-async function getUrlFileType(url){
+async function isMediaSupported(url){
+    let type = await getUrlContentTypeRecursive(url);
+    if (type != null){
+        return supportedMediaTypes.includes(type.split('/')[0]);
+    }
+
+    return false;
+}
+
+/**
+ * @param {string} url
+ * @returns {Promise<string | null>}
+ */
+async function getUrlContentTypeRecursive(url){
     var type = null;
     var responce = await fetch(url);
     if (responce.redirected){
-        console.log(`redirected, new url is ${responce.url}`);
-        type = await getUrlFileType(responce.url);
+        warning(`Redirected, new url is ${responce.url}`);
+        type = await getUrlContentTypeRecursive(responce.url);
     }
     else{
         type = responce.headers.get('Content-Type');
+        console.log(`Url content type is ${type}`);
     }
     
     return type;
