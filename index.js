@@ -311,14 +311,17 @@ async function getUrlContentTypeRecursive(url){
  * @returns {string | null>}
  */
 function getMediaType(contentType){
+    var type = null;
     supportedMediaTypes.forEach((supportedTypes, mediaType) => {
         if (supportedTypes.includes(contentType)){
-            return mediaType;
+            type = mediaType;
         }
     })
 
-    warning(`content type ${contentType} doesn't supported`);
-    return null;
+    if (type == null){
+        warning(`Content type ${contentType} doesn't supported`);
+    }
+    return type;
 }
 
 /**
