@@ -280,17 +280,23 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function() {
-            var contentType = xhr.getResponseHeader('Content-Type');
-            if (contentType) {
-                xhr.abort();
-                console.log(contentType);
-            }
-        };
-        xhr.send();
+        getUrlFileType(url);
     }
 
     return mediaArray;
+}
+
+/**
+ * @param {string} text 
+ * @returns {string | null}
+ */
+async function getUrlFileType(url){
+    await fetch(url)
+        .then(responce =>{
+            if (responce.redirected)
+                return getUrlFileType(responce.url);
+            else{
+                return responce.headers.get('Content-Type');
+            }
+        })
 }
