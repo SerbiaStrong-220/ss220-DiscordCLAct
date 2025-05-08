@@ -59,6 +59,8 @@ async function trySendMessage(){
         mainEmbed.addFields( { name: key, value: value } );
     }
 
+    extractMedia(text);
+
     let embeds = new Array();
     let images = extractImageURLs(text);
     if (images.length > 0){
@@ -263,4 +265,31 @@ function deleteGitComments(text){
     const commentRegex = /<!--[\s\S]*?-->|<!--[\s\S]*/gm;
 
     return text.replaceAll(commentRegex, '').trim();
+}
+
+/**
+ * @param {string} text 
+ * @returns {string[]}
+ */
+async function extractMedia(text){
+    const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
+
+    let mediaArray = new Array();
+    let i = 0;
+    let result;
+    while((result = urlRegex.exec(text)) != null){
+        let url = result[0];
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onreadystatechange = function() {
+            var contentType = xhr.getResponseHeader('Content-Type');
+            if (contentType) {
+                xhr.abort();
+                console.log(contentType);
+            }
+        };
+        xhr.send();
+    }
+
+    return mediaArray;
 }
