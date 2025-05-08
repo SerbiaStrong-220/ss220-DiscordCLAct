@@ -55,7 +55,7 @@ async function trySendMessage(){
     if (authorInfoMap === null || authorInfoMap.size <= 0) return;
 
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
-    let mainEmbed = new EmbedBuilder()
+    var mainEmbed = new EmbedBuilder()
         .setColor(0x3CB371)
         .setTitle(title)
         .setURL(pr_url);
@@ -76,12 +76,12 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((url, type) =>{
             if (i == 0){
-                setMediaInEmbed(type, url, mainEmbed);
+                mainEmbed = setMediaInEmbed(type, url, mainEmbed);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
-                let embed = new EmbedBuilder()
+                var embed = new EmbedBuilder()
                 .setURL(pr_url);
-                setMediaInEmbed(type, url, embed);
+                embed = setMediaInEmbed(type, url, embed);
                 embeds[i] = embed;
             }
             i++;
@@ -329,6 +329,7 @@ function getMediaType(contentType){
  * @param {string} type
  * @param {string} url 
  * @param {EmbedBuilder} embed 
+ * @returns {EmbedBuilder}
  */
 function setMediaInEmbed(type, url, embed){
     switch (type){
@@ -345,4 +346,6 @@ function setMediaInEmbed(type, url, embed){
         default:
             break;
     }
+
+    return embed;
 }
