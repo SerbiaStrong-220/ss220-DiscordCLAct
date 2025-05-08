@@ -280,7 +280,7 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        let type = getUrlFileType(url);
+        let type = await getUrlFileType(url);
         if (type != null){
             console.log(`type is ${type[Symbol]}`);
         }
