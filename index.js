@@ -75,7 +75,7 @@ async function trySendMessage(){
         }
 
         let i = 0;
-        media.forEach((type, url) =>{
+        media.forEach((url, type) =>{
             if (i == 0){
                 setMediaInEmbed(type, url, mainEmbed);
                 embeds[i] = mainEmbed;
@@ -276,8 +276,9 @@ async function extractMedia(text){
         if (mediaType == null){
             continue;
         }
-
-        mediaMap.set(mediaType, url);
+        
+        console.log(`media type is ${mediaType}`);
+        mediaMap.set(url, mediaType);
         i++
     }
 
@@ -311,12 +312,13 @@ async function getUrlContentTypeRecursive(url){
  * @returns {string | null>}
  */
 function getMediaType(contentType){
-    supportedMediaTypes.forEach((mediaType, contentTypes) => {
-        if (contentTypes.includes(contentType)){
+    supportedMediaTypes.forEach((mediaType, supportedTypes) => {
+        if (supportedTypes.includes(contentType)){
             return mediaType;
         }
     })
 
+    warning(`content type ${contentType} doesn't supported`);
     return null;
 }
 
