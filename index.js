@@ -4,6 +4,8 @@ import { AttachmentBuilder, Embed, EmbedBuilder, WebhookClient } from 'discord.j
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import https from 'https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -362,24 +364,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     }
 
     const fileName = "video.mp4";
-    const outputPath = path.join(outputFolder, fileName);
-    const writer = fs.createWriteStream(outputPath);
-
-    const reader = response.body.getReader();
-
-    const pump = async () => {
-        const { done, value } = await reader.read();
-        if (done) {
-            writer.end();
-            console.log('Видео успешно скачано!');
-            return;
-        }
-        console.log('Запись');
-        writer.write(value);
-        await pump();
-    };
-
-    await pump();
+    await downloadHttps(url);
     return {mediaType: mediaType, fileName: fileName};
 }
 
@@ -397,4 +382,22 @@ function getVideoEmbed(videoName, url, title){
             url: `attachment://${videoName}`
         }
     }
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @returns {Promise<void>}
+ */
+function downloadHttps(url){
+    return new Promise(resolve =>{
+        const savePath = path.join(__dirname, 'video.mp4');
+        const file = fs.createWriteStream(savePath);
+        const request = https.get(url, response => {
+            response.pipe(file);
+            file.on('finish', () => {
+                file.close(() => console.log('Файл успешно загружен. Можете начинать чтение.'));
+            });
+        });
+    });
 }
