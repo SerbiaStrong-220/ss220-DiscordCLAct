@@ -504,9 +504,9 @@ function sendVideos(files){
             return;
         }
 
-        var path = path.join(__dirname, file);
-        console.log(`Path is ${path}`);
-        attachment[attachment.length] = new AttachmentBuilder(path, file);
+        var filePath = path.join(__dirname, file);
+        console.log(`Path is ${filePath}`);
+        attachment[attachment.length] = new AttachmentBuilder(filePath, file);
         embeds[embeds.length] = getVideoEmbed(file);
         i++;
     })
