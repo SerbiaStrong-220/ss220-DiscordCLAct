@@ -404,10 +404,10 @@ async function downloadMedia(url, outputFolder, recursive = true){
     let urlType = getUrlType(url);
     switch (urlType){
         case 'http':
-            await downloadHttp(url);
+            await downloadHttp(url, fileName);
             break;
         case 'https':
-            await downloadHttps(url);
+            await downloadHttps(url, fileName);
             break;
         default:
             return null;
