@@ -62,6 +62,7 @@ async function trySendMessage(){
     }
 
     console.info(`Original message:\n${text.trim()}\n`);
+    text = deleteCLIgnore(text);
     text = deleteGitComments(text);
 
     let author = pull_request.data.user.login;
@@ -299,6 +300,17 @@ function extractInfoLines(text){
  */
 function deleteGitComments(text){
     const commentRegex = /<!--[\s\S]*?-->|<!--[\s\S]*/gm;
+
+    return text.replaceAll(commentRegex, '').trim();
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function deleteCLIgnore(text){
+    const tag = "CLIgnore";
+    const commentRegex = RegExp(`<!--${tag}-->[\s\S]*<!--\/${tag}-->`, 'gm');
 
     return text.replaceAll(commentRegex, '').trim();
 }
