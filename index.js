@@ -76,7 +76,7 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((type, url) =>{
             if (i == 0){
-                mainEmbed = getVideoEmbed(url, pr_url);
+                mainEmbed = getVideoEmbed(url, pr_url, title);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 var embed = new EmbedBuilder()
@@ -358,6 +358,7 @@ function setMediaInEmbed(type, url, embed){
  * @returns {Embed}
  */
 function getVideoEmbed(videoUrl, url, title){
+    console.log(`Video url is ${videoUrl}`);
     return {
         url: url,
         video: { url: videoUrl },
