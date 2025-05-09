@@ -78,6 +78,7 @@ async function trySendMessage(){
             if (i == 0){
                 console.log(`Video url is ${url}`);
                 mainEmbed = getVideoEmbed(url, pr_url, title);
+                console.log(`${mainEmbed.data.video}`);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 var embed = new EmbedBuilder()
@@ -362,7 +363,7 @@ function getVideoEmbed(videoUrl, url, title){
     console.log(`Video url is ${videoUrl}`);
     return {
         url: url,
-        video: { proxyURL: videoUrl },
+        video: { url: videoUrl },
         title: title,
         color: 0x3CB371
     }
