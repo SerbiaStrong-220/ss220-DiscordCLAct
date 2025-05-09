@@ -96,10 +96,18 @@ async function trySendMessage(){
                 }
 
                 let i = 0;
+                let messageSize = 0;
                 mediaArray.forEach(media =>{
                     if (i > imageLimit){
                         return;
                     }
+
+                    let newMessageSize = messageSize + media.size;
+                    if (newMessageSize > messageSizeLimit){
+                        warning(`${media.name} will exceed the message size by up to ${newMessageSize} bytes, which exceeds the limit of ${messageSizeLimit} bytes. Skip it`);
+                        return;
+                    }
+                    messageSize = newMessageSize;
 
                     let attachment = new AttachmentBuilder(path.join(__dirname, media.name), media.name);
                     attachments[attachments.length] = attachment;
