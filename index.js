@@ -374,6 +374,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
             console.log('Видео успешно скачано!');
             return;
         }
+        console.log('Запись');
         writer.write(value);
         await pump();
     };
