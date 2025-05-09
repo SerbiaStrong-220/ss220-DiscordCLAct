@@ -35,7 +35,7 @@ const supportedMediaExtensions = new Map([
 ])
 
 const imageLimit = 10;
-const videoLimit = 4;
+const videoLimit = 10;
 const fileSizeLimit = 8388608; // 8 MB
 
 try {
