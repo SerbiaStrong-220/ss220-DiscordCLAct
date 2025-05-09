@@ -392,15 +392,20 @@ function getVideoEmbed(videoName, url, title){
  * @returns {Promise<void>}
  */
 function downloadHttps(url){
-    return new Promise(resolve =>{
+    return new Promise(resolve => {
         const savePath = path.join(__dirname, 'video.mp4');
         const file = fs.createWriteStream(savePath);
-        const request = https.get(url, response => {
+        const request = https.get(url, async response => {
             response.pipe(file);
-            file.on('finish', () => {
-                resolve();
-                file.close(() => console.log(`Файл сохранён в ${savePath}`));
-            });
+            await waitForFinish(file);
+            resolve();
         });
+    });
+}
+
+function waitForFinish(writeStream) {
+    return new Promise((resolve, reject) => {
+        writeStream.on('finish', resolve);
+        writeStream.on('error', reject);
     });
 }
