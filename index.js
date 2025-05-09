@@ -337,11 +337,7 @@ function setMediaInEmbed(type, url, embed){
             embed.setImage(url);
             break;
         case "video":
-            embed.data.video ={
-                url: url,
-                height: 300,
-                width: 300
-            }
+            embed.data.video = { url };
             break;
         default:
             break;
