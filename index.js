@@ -365,13 +365,16 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     const outputPath = path.join(outputFolder, fileName);
     const writer = fs.createWriteStream(outputPath);
 
-    response.body.on('data', chunk => {
-        writer.write(chunk);
-    });
-
-    response.body.on('end', () => {
-        writer.end();
-    });
+    async () => {
+        const { done, value } = await reader.read();
+        if (done) {
+            writer.end();
+            console.log('Видео успешно скачано!');
+            return;
+        }
+        writer.write(value);
+        pump(); // Продолжаем читать данные
+    };
 
     return {mediaType: mediaType, fileName: fileName};
 }
