@@ -354,11 +354,14 @@ function setMediaInEmbed(type, url, embed){
  * 
  * @param {string} videoUrl 
  * @param {string} url 
+ * @param {string} title
  * @returns {Embed}
  */
-function getVideoEmbed(videoUrl, url){
+function getVideoEmbed(videoUrl, url, title){
     return {
         url: url,
-        video: { url: videoUrl }
+        video: { url: videoUrl },
+        title: title,
+        color: 0x3CB371
     }
 }
