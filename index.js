@@ -119,9 +119,13 @@ async function trySendMessage(){
                 videoArray = files;
                 break;
             default:
-                embeds[0] = mainEmbed;
+                break;
         }
     })
+
+    if (embeds.length <= 0){
+        embeds[0] = mainEmbed;
+    }
 
     console.log(`Dir is ${__dirname}`);
     if (attachments.length > 0){
