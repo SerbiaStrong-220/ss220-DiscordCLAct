@@ -365,6 +365,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
 
     const fileName = "video.mp4";
     await downloadHttps(url);
+    console.log('File downloaded');
     return {mediaType: mediaType, fileName: fileName};
 }
 
