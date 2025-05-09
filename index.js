@@ -1,6 +1,6 @@
 import { error, getInput, setFailed, warning } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { AttachmentBuilder, Embed, EmbedBuilder, WebhookClient } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
@@ -345,29 +345,6 @@ async function extractMedia(text){
     }
 
     return mediaMap;
-}
-
-/**
- * @param {string} url
- * @returns {Promise<{contentType: string, url: string} | null>}
- */
-async function getUrlContentTypeRecursive(url){
-    var type = null;
-    var responce = await fetch(url);
-    if (responce.redirected){
-        warning(`Redirected, new url is ${responce.url}`);
-        type = await getUrlContentTypeRecursive(responce.url);
-    }
-    else{
-        type = responce.headers.get('Content-Type');
-        if (type != null){
-            let contentType = type.split('/')[1];
-            console.log(`Url content type is ${contentType}`);
-            type = {contentType: contentType, url: url};
-        }
-    }
-    
-    return type;
 }
 
 /**
