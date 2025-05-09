@@ -504,8 +504,11 @@ function sendVideos(files){
             return;
         }
 
-        attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, file), file);
+        var path = path.join(__dirname, file);
+        console.log(`Path is ${path}`);
+        attachment[attachment.length] = new AttachmentBuilder(path, file);
         embeds[embeds.length] = getVideoEmbed(file);
+        i++;
     })
 
     webhookClient.send({
