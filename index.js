@@ -34,6 +34,9 @@ const supportedMediaExtensions = new Map([
     ["video", ["mp4", "webm", "gif"]]
 ])
 
+const imageLimit = 10;
+const videoLimit = 4;
+
 try {
     trySendMessage();
 } catch (error) {
@@ -74,37 +77,58 @@ async function trySendMessage(){
 
     let attachments = new Array();
     let embeds = new Array();
+    let videoArray = new Array();
     let media = await extractMedia(text);
-    if (media.size > 0){
-        console.info(`Found ${media.size} media`);
-        
-        if (media.size > 10){
-            warning(`More than 10 media found, only the first 10 will be sent`);
+    media.forEach((files, mediaType) =>{
+        if (files.length <= 0){
+            return;
         }
 
-        let i = 0;
-        media.forEach((mediaType, fileName) =>{
-            if (i == 0){
-                console.log(`Video name is ${fileName}`);
-                let attachment = new AttachmentBuilder(path.join(__dirname, fileName), fileName);
-                attachments[attachments.length] = attachment;
-                mainEmbed = getVideoEmbed(fileName, pr_url, title);
-                embeds[i] = mainEmbed;
-            } else if (i < 10){
-                var embed = new EmbedBuilder()
-                .setURL(pr_url);
-                embeds[i] = embed;
-            }
-            i++;
-        })
-    }
-    else
-        embeds[0] = mainEmbed;
+        console.info(`Found ${files.length} media with type ${mediaType}`);
+        switch (mediaType){
+            case 'image':
+                if (files.length > imageLimit){
+                    warning(`More than ${imageLimit} images found, only the first ${imageLimit} will be sent`);
+                }
+
+                let i = 0;
+                files.forEach(file =>{
+                    if (i > imageLimit){
+                        return;
+                    }
+
+                    let attachment = new AttachmentBuilder(path.join(__dirname, file), file);
+                    attachment[attachment.length] = attachment;
+                    if (i == 0){
+                        mainEmbed.setImage(`attachment://${file}`);
+                        embeds[i] = mainEmbed;
+                    }
+                    else{
+                        embeds[i] = new EmbedBuilder()
+                            .setURL(pr_url)
+                            .setImage(`attachment://${file}`);
+                    }
+                    i++;
+                })
+                break;
+            case 'video':
+                if (files.length > videoLimit){
+                    warning(`More than ${videoLimit} images found, only the first ${videoLimit} will be sent`);
+                }
+
+                videoArray = files;
+                break;
+            default:
+                embeds[0] = mainEmbed;
+        }
+    })
 
     webhookClient.send({
         embeds: embeds,
         files: attachments
     });
+
+    sendVideos(videoArray);
 }
 
 /**
@@ -267,7 +291,7 @@ function deleteGitComments(text){
 
 /**
  * @param {string} text 
- * @returns {Promise<Map<string, string>>}
+ * @returns {Promise<Map<string, string[]>>}
  */
 async function extractMedia(text){
     const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
@@ -283,7 +307,14 @@ async function extractMedia(text){
             continue;
         }
         
-        mediaMap.set(responce.fileName, responce.mediaType);
+        if (mediaMap.has(responce.mediaType)){
+            let array = mediaMap.get(responce.mediaType);
+            array[array.length] = responce.fileName;
+            mediaMap.set(responce.mediaType, array);
+        }
+        else{
+            mediaMap.set(responce.mediaType, [responce.fileName]);
+        }
         i++
     }
 
@@ -339,10 +370,10 @@ function getMediaType(extension){
  * 
  * @param {string} url 
  * @param {string} outputFolder
- * @param {boolean} recurcive
+ * @param {boolean} recursive
  * @returns {Promise<{mediaType: string, fileName: string} | null>}
  */
-async function downloadMedia(url, outputFolder, recurcive = true){
+async function downloadMedia(url, outputFolder, recursive = true){
     if (!fs.existsSync(outputFolder)){
         fs.mkdirSync(outputFolder, { recursive: true });
     }
@@ -352,7 +383,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
         return null;
     }
 
-    if (response.redirected && recurcive){
+    if (response.redirected && recursive){
         warning(`Redirected, new url is ${response.url}`);
         return await downloadMedia(response.url, outputFolder, true);
     }
@@ -363,11 +394,114 @@ async function downloadMedia(url, outputFolder, recurcive = true){
         return null;
     }
 
-    console.log(`media type is ${mediaType}`);
-    const fileName = "video.mp4";
-    await downloadHttps(url);
+    console.log(`Media type is ${mediaType}`);
+    const fileNameRegex = new RegExp(`[^\/\s]*\.${extension}`);
+    var fileName = fileNameRegex.exec(url)?.[0];
+    if (fileName == null){
+        return null;
+    }
+
+    let urlType = getUrlType(url);
+    switch (urlType){
+        case 'http':
+            await downloadHttp(url);
+            break;
+        case 'https':
+            await downloadHttps(url);
+            break;
+        default:
+            return null;
+    }
+
     console.log('File downloaded');
     return {mediaType: mediaType, fileName: fileName};
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @param {string} fileName
+ * @returns {Promise<void>}
+ */
+function downloadHttp(url, fileName){
+    return new Promise(resolve => {
+        const savePath = path.join(__dirname, fileName);
+        const file = fs.createWriteStream(savePath);
+        const request = http.get(url, async response => {
+            response.pipe(file);
+            await waitForFinish(file);
+            console.log(`File saved in ${savePath}`);
+            resolve();
+        });
+    });
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @param {string} fileName
+ * @returns {Promise<void>}
+ */
+function downloadHttps(url, fileName){
+    return new Promise(resolve => {
+        const savePath = path.join(__dirname, fileName);
+        const file = fs.createWriteStream(savePath);
+        const request = https.get(url, async response => {
+            response.pipe(file);
+            await waitForFinish(file);
+            console.log(`File saved in ${savePath}`);
+            resolve();
+        });
+    });
+}
+
+/**
+ * 
+ * @param {fs.WriteStream} writeStream 
+ * @returns {Promise<void>}
+ */
+function waitForFinish(writeStream) {
+    return new Promise((resolve, reject) => {
+        writeStream.on('finish', resolve);
+        writeStream.on('error', reject);
+    });
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @returns {string?}
+ */
+function getUrlType(url){
+    const urlTypeRegex = /^[^:]*/;
+    return urlTypeRegex.exec(url)?.[0];
+}
+
+/**
+ * 
+ * @param {string[]} files 
+ */
+function sendVideos(files){
+    if (files.length <= 0){
+        return;
+    }
+
+    let i = 0;
+    let embeds = new Array();
+    let attachment = new Array();
+    files.forEach(file =>{
+        if (i > videoLimit){
+            return;
+        }
+
+        attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, file), file);
+        embeds[embeds.length] = getVideoEmbed(file);
+    })
+
+    webhookClient.send({
+        embeds: embeds,
+        files: files
+    })
 }
 
 /**
@@ -376,37 +510,10 @@ async function downloadMedia(url, outputFolder, recurcive = true){
  * @param {string} title 
  * @returns {Embed}
  */
-function getVideoEmbed(videoName, url, title){
+function getVideoEmbed(videoName){
     return {
-        url: url,
-        title: title,
         video: {
             url: `attachment://${videoName}`
         }
     }
-}
-
-/**
- * 
- * @param {string} url 
- * @returns {Promise<void>}
- */
-function downloadHttps(url){
-    return new Promise(resolve => {
-        const savePath = path.join(__dirname, 'video.mp4');
-        const file = fs.createWriteStream(savePath);
-        const request = https.get(url, async response => {
-            response.pipe(file);
-            await waitForFinish(file);
-            console.log(`Файл сохранён в ${savePath}`);
-            resolve();
-        });
-    });
-}
-
-function waitForFinish(writeStream) {
-    return new Promise((resolve, reject) => {
-        writeStream.on('finish', resolve);
-        writeStream.on('error', reject);
-    });
 }
