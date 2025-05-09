@@ -365,7 +365,9 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     const outputPath = path.join(outputFolder, fileName);
     const writer = fs.createWriteStream(outputPath);
 
-    async () => {
+    const reader = response.body.getReader();
+
+    const pump = async () => {
         const { done, value } = await reader.read();
         if (done) {
             writer.end();
@@ -373,9 +375,10 @@ async function downloadMedia(url, outputFolder, recurcive = true){
             return;
         }
         writer.write(value);
-        pump();
+        await pump();
     };
 
+    await pump();
     return {mediaType: mediaType, fileName: fileName};
 }
 
