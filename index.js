@@ -76,6 +76,7 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((type, url) =>{
             if (i == 0){
+                console.log(`Video url is ${url}`);
                 mainEmbed = getVideoEmbed(url, pr_url, title);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
