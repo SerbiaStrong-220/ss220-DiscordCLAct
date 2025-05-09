@@ -32,8 +32,8 @@ const replaceData = new Map([
 const MediaTypes = { Image: "image", Video: "video" }
 
 const supportedMediaExtensions = new Map([
-    [MediaTypes.Image, ["jpg", "png"]],
-    [MediaTypes.Video, ["mp4", "webm", "gif"]]
+    [MediaTypes.Image, ["png", "jpg", "jpeg", "webp"]],
+    [MediaTypes.Video, ["mp4", "webm", "gif", "mov", "ts", "mkv", "avi", "wmw"]]
 ])
 
 const imageLimit = 10;
