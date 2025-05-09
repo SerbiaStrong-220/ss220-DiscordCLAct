@@ -399,7 +399,7 @@ function downloadHttps(url){
             response.pipe(file);
             file.on('finish', () => {
                 file.close(() => console.log('Файл успешно загружен. Можете начинать чтение.'));
-                resolve;
+                resolve();
             });
         });
     });
