@@ -518,7 +518,7 @@ function sendVideos(files, url){
 
     webhookClient.send({
         content: 'Медиа',
-        embeds: embeds,
+        // embeds: embeds,
         files: attachment
     })
 }
