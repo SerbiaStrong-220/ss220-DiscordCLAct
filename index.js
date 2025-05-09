@@ -361,7 +361,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
         return null;
     }
 
-    const fileName = path.basename(url);
+    const fileName = "video.mp4";
     const outputPath = path.join(outputFolder, fileName);
     const writer = fs.createWriteStream(outputPath);
 
@@ -373,7 +373,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
             return;
         }
         writer.write(value);
-        pump(); // Продолжаем читать данные
+        pump();
     };
 
     return {mediaType: mediaType, fileName: fileName};
