@@ -398,6 +398,7 @@ function downloadHttps(url){
         const request = https.get(url, async response => {
             response.pipe(file);
             await waitForFinish(file);
+            console.log(`Файл сохранён в ${savePath}`);
             resolve();
         });
     });
