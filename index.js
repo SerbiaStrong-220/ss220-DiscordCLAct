@@ -398,7 +398,7 @@ function downloadHttps(url){
         const request = https.get(url, response => {
             response.pipe(file);
             file.on('finish', () => {
-                file.close(() => console.log('Файл успешно загружен. Можете начинать чтение.'));
+                file.close(() => console.log(`Файл сохранён в ${savePath}`));
                 resolve();
             });
         });
