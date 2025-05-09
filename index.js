@@ -1,6 +1,6 @@
 import { error, getInput, setFailed, warning } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { EmbedBuilder, WebhookClient } from 'discord.js';
+import { EmbedBuilder, WebhookClient, Embed, APIEmbedVideo } from 'discord.js';
 
 const webhook_id = getInput('webhook_id');
 const webhook_token = getInput('webhook_token');
@@ -76,7 +76,7 @@ async function trySendMessage(){
         let i = 0;
         media.forEach((type, url) =>{
             if (i == 0){
-                mainEmbed = setMediaInEmbed(type, url, mainEmbed);
+                mainEmbed = getVideoEmbed(url, pr_url);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 var embed = new EmbedBuilder()
@@ -348,4 +348,17 @@ function setMediaInEmbed(type, url, embed){
     }
 
     return embed;
+}
+
+/**
+ * 
+ * @param {string} videoUrl 
+ * @param {string} url 
+ * @returns {Embed}
+ */
+function getVideoEmbed(videoUrl, url){
+    return {
+        url: url,
+        video: { url: videoUrl }
+    }
 }
