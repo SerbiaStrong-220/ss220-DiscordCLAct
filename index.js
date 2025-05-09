@@ -489,8 +489,9 @@ function getUrlType(url){
 /**
  * 
  * @param {string[]} files 
+ * @param {string} url
  */
-function sendVideos(files){
+function sendVideos(files, url){
     if (files.length <= 0){
         return;
     }
@@ -507,7 +508,7 @@ function sendVideos(files){
         var filePath = path.join(__dirname, file);
         console.log(`Path is ${filePath}`);
         attachment[attachment.length] = new AttachmentBuilder(filePath, file);
-        embeds[embeds.length] = getVideoEmbed(file);
+        embeds[embeds.length] = getVideoEmbed(file, url);
         i++;
     })
 
@@ -523,8 +524,9 @@ function sendVideos(files){
  * @param {string} title 
  * @returns {Embed}
  */
-function getVideoEmbed(videoName){
+function getVideoEmbed(videoName, url){
     return {
+        url: url,
         video: {
             url: `attachment://${videoName}`
         }
