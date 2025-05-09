@@ -74,7 +74,7 @@ async function trySendMessage(){
         }
 
         let i = 0;
-        media.forEach((url, type) =>{
+        media.forEach((type, url) =>{
             if (i == 0){
                 mainEmbed = setMediaInEmbed(type, url, mainEmbed);
                 embeds[i] = mainEmbed;
