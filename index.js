@@ -351,6 +351,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     }
 
     if (response.redirected && recurcive){
+        warning(`Redirected, new url is ${response.url}`);
         return await downloadMedia(response.url, outputFolder, true);
     }
 
@@ -363,7 +364,15 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     const fileName = path.basename(url);
     const outputPath = path.join(outputFolder, fileName);
     const writer = fs.createWriteStream(outputPath);
-    response.body.pipeTo(writer);
+
+    response.body.on('data', chunk => {
+        writer.write(chunk);
+    });
+
+    response.body.on('end', () => {
+        writer.end();
+    });
+
     return {mediaType: mediaType, fileName: fileName};
 }
 
