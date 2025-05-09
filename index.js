@@ -86,7 +86,7 @@ async function trySendMessage(){
         media.forEach((mediaType, fileName) =>{
             if (i == 0){
                 console.log(`Video name is ${fileName}`);
-                let attachment = new AttachmentBuilder(__dirname, fileName);
+                let attachment = new AttachmentBuilder(path.join(__dirname, fileName), fileName);
                 attachments[attachments.length] = attachment;
                 mainEmbed = getVideoEmbed(fileName, pr_url, title);
                 embeds[i] = mainEmbed;
