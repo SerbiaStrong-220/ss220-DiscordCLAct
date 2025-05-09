@@ -1,6 +1,9 @@
 import { error, getInput, setFailed, warning } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { EmbedBuilder, WebhookClient, Embed, APIEmbedVideo } from 'discord.js';
+import { AttachmentBuilder, Embed, EmbedBuilder, WebhookClient } from 'discord.js';
+import fs from 'fs';
+import { url } from 'inspector';
+import path from 'path';
 
 const webhook_id = getInput('webhook_id');
 const webhook_token = getInput('webhook_token');
@@ -21,7 +24,7 @@ const replaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
-const supportedMediaTypes = new Map([
+const supportedMediaExtensions = new Map([
     ["image", ["jpg", "png"]],
     ["video", ["mp4", "webm", "gif"]]
 ])
@@ -64,6 +67,7 @@ async function trySendMessage(){
         mainEmbed.addFields( { name: key, value: value } );
     }
 
+    let attachments = new Array();
     let embeds = new Array();
     let media = await extractMedia(text);
     if (media.size > 0){
@@ -74,16 +78,16 @@ async function trySendMessage(){
         }
 
         let i = 0;
-        media.forEach((type, url) =>{
+        media.forEach((mediaType, fileName) =>{
             if (i == 0){
-                console.log(`Video url is ${url}`);
-                mainEmbed = getVideoEmbed(url, pr_url, title);
-                console.log(`${mainEmbed.data.video}`);
+                console.log(`Video name is ${fileName}`);
+                let attachment = new AttachmentBuilder(__dirname, fileName);
+                attachments[attachments.length] = attachment;
+                mainEmbed = getVideoEmbed(fileName, pr_url, title);
                 embeds[i] = mainEmbed;
             } else if (i < 10){
                 var embed = new EmbedBuilder()
                 .setURL(pr_url);
-                embed = setMediaInEmbed(type, url, embed);
                 embeds[i] = embed;
             }
             i++;
@@ -94,6 +98,7 @@ async function trySendMessage(){
 
     webhookClient.send({
         embeds: embeds,
+        files: attachments
     });
 }
 
@@ -268,18 +273,12 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        let responce = await getUrlContentTypeRecursive(url);
+        let responce = await downloadMedia(url, __dirname, true);
         if (responce == null){
             continue;
         }
-
-        let mediaType = getMediaType(responce.contentType);
-        if (mediaType == null){
-            continue;
-        }
         
-        console.log(`media type is ${mediaType}`);
-        mediaMap.set(responce.url, mediaType);
+        mediaMap.set(responce.fileName, responce.mediaType);
         i++
     }
 
@@ -310,61 +309,73 @@ async function getUrlContentTypeRecursive(url){
 }
 
 /**
- * @param {string} contentType
- * @returns {string | null>}
+ * @param {string?} contentType
+ * @returns {string?>}
  */
-function getMediaType(contentType){
+function getMediaType(extension){
+    if (extension == null){
+        return null;
+    }
+
     var type = null;
-    supportedMediaTypes.forEach((supportedTypes, mediaType) => {
-        if (supportedTypes.includes(contentType)){
+    supportedMediaExtensions .forEach((extensions, mediaType) => {
+        if (extensions.includes(extension)){
             type = mediaType;
         }
     })
 
     if (type == null){
-        warning(`Content type ${contentType} doesn't supported`);
+        warning(`Extension ${extension} doesn't supported`);
     }
     return type;
 }
 
 /**
- * @param {string} type
+ * 
  * @param {string} url 
- * @param {EmbedBuilder} embed 
- * @returns {EmbedBuilder}
+ * @param {string} outputFolder
+ * @param {boolean} recurcive
+ * @returns {Promise<{mediaType: string, fileName: string} | null>}
  */
-function setMediaInEmbed(type, url, embed){
-    switch (type){
-        case "image":
-            embed.setImage(url);
-            break;
-        case "video":
-            embed.data.video = { 
-                url: url,
-                width: 200,
-                height: 200
-            };
-            break;
-        default:
-            break;
+async function downloadMedia(url, outputFolder, recurcive = true){
+    if (!fs.existsSync(outputFolder)){
+        fs.mkdirSync(outputFolder, { recursive: true });
     }
 
-    return embed;
+    const response = await fetch(url);
+    if (!response.ok){
+        return null;
+    }
+
+    if (response.redirected && recurcive){
+        return await downloadMedia(response.url, outputFolder, true);
+    }
+
+    let extension = response.headers.get('Content-Type')?.split('/')[1];
+    let mediaType = getMediaType(extension);
+    if (mediaType == null){
+        return null;
+    }
+
+    const fileName = path.basename(url);
+    const outputPath = path.join(outputFolder, fileName);
+    const writer = fs.createWriteStream(outputPath);
+    response.body.pipe(writer);
+    return {mediaType: mediaType, fileName: fileName};
 }
 
 /**
- * 
- * @param {string} videoUrl 
+ * @param {string} videoName 
  * @param {string} url 
- * @param {string} title
+ * @param {string} title 
  * @returns {Embed}
  */
-function getVideoEmbed(videoUrl, url, title){
-    console.log(`Video url is ${videoUrl}`);
+function getVideoEmbed(videoName, url, title){
     return {
         url: url,
-        video: { url: videoUrl },
         title: title,
-        color: 0x3CB371
+        video: {
+            url: `attachment://${videoName}`
+        }
     }
 }
