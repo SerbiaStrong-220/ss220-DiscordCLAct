@@ -363,7 +363,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
     const fileName = path.basename(url);
     const outputPath = path.join(outputFolder, fileName);
     const writer = fs.createWriteStream(outputPath);
-    response.body.pipe(writer);
+    response.body.pipeTo(writer);
     return {mediaType: mediaType, fileName: fileName};
 }
 
