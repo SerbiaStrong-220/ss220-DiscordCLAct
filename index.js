@@ -398,8 +398,8 @@ function downloadHttps(url){
         const request = https.get(url, response => {
             response.pipe(file);
             file.on('finish', () => {
-                file.close(() => console.log(`Файл сохранён в ${savePath}`));
                 resolve();
+                file.close(() => console.log(`Файл сохранён в ${savePath}`));
             });
         });
     });
