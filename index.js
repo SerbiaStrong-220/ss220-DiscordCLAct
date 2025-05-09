@@ -123,6 +123,7 @@ async function trySendMessage(){
         }
     })
 
+    console.log(`Dir is ${__dirname}`);
     if (attachments.length > 0){
         webhookClient.send({
             embeds: embeds,
@@ -135,6 +136,7 @@ async function trySendMessage(){
         });
     }
 
+    console.log(`Dir is ${__dirname}`);
     sendVideos(videoArray);
 }
 
@@ -493,6 +495,7 @@ function sendVideos(files){
         return;
     }
 
+    console.log(`Dir is ${__dirname}`);
     let i = 0;
     let embeds = new Array();
     let attachment = new Array();
