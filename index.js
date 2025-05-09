@@ -99,7 +99,7 @@ async function trySendMessage(){
                     }
 
                     let attachment = new AttachmentBuilder(path.join(__dirname, file), file);
-                    attachment[attachment.length] = attachment;
+                    attachments[attachments.length] = attachment;
                     if (i == 0){
                         mainEmbed.setImage(`attachment://${file}`);
                         embeds[i] = mainEmbed;
@@ -128,7 +128,6 @@ async function trySendMessage(){
         embeds[0] = mainEmbed;
     }
 
-    console.log(`Dir is ${__dirname}`);
     if (attachments.length > 0){
         webhookClient.send({
             embeds: embeds,
@@ -141,7 +140,6 @@ async function trySendMessage(){
         });
     }
 
-    console.log(`Dir is ${__dirname}`);
     sendVideos(videoArray);
 }
 
@@ -507,40 +505,18 @@ function sendVideos(files, url){
         return;
     }
 
-    console.log(`Dir is ${__dirname}`);
     let i = 0;
-    let embeds = new Array();
     let attachment = new Array();
     files.forEach(file =>{
         if (i > videoLimit){
             return;
         }
 
-        var filePath = path.join(__dirname, file);
-        console.log(`Path is ${filePath}`);
-        attachment[attachment.length] = new AttachmentBuilder(filePath, file);
-        embeds[embeds.length] = getVideoEmbed(file, url);
+        attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, file), file);
         i++;
     })
 
     webhookClient.send({
-        //content: 'Медиа',
-        // embeds: embeds,
         files: attachment
     })
-}
-
-/**
- * @param {string} videoName 
- * @param {string} url 
- * @param {string} title 
- * @returns {Embed}
- */
-function getVideoEmbed(videoName, url){
-    return {
-        url: url,
-        video: {
-            url: `attachment://${videoName}`
-        }
-    }
 }
