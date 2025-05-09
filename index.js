@@ -123,10 +123,17 @@ async function trySendMessage(){
         }
     })
 
-    webhookClient.send({
-        embeds: embeds,
-        files: attachments
-    });
+    if (attachments.length > 0){
+        webhookClient.send({
+            embeds: embeds,
+            files: attachments
+        });
+    }
+    else{
+        webhookClient.send({
+            embeds: embeds
+        });
+    }
 
     sendVideos(videoArray);
 }
