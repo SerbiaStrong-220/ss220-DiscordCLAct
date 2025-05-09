@@ -513,7 +513,7 @@ function sendVideos(files){
 
     webhookClient.send({
         embeds: embeds,
-        files: files
+        files: attachment
     })
 }
 
