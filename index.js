@@ -29,14 +29,16 @@ const replaceData = new Map([
     ["fix:", ":tools:"]
 ]);
 
+const MediaTypes = { Image: "image", Video: "video" }
+
 const supportedMediaExtensions = new Map([
-    ["image", ["jpg", "png"]],
-    ["video", ["mp4", "webm", "gif"]]
+    [MediaTypes.Image, ["jpg", "png"]],
+    [MediaTypes.Video, ["mp4", "webm", "gif"]]
 ])
 
 const imageLimit = 10;
 const videoLimit = 10;
-const fileSizeLimit = 8388608; // 8 MB
+const messageSizeLimit = 8388608; // 8 MB
 
 try {
     trySendMessage();
@@ -79,45 +81,45 @@ async function trySendMessage(){
     let attachments = new Array();
     let embeds = new Array();
     let videoArray = new Array();
-    let media = await extractMedia(text);
-    media.forEach((files, mediaType) =>{
-        if (files.length <= 0){
+    let mediaMap = await extractMedia(text);
+    mediaMap.forEach((mediaArray, mediaType) =>{
+        if (mediaArray.length <= 0){
             return;
         }
 
-        console.info(`Found ${files.length} media with type ${mediaType}`);
+        console.info(`Found ${mediaArray.length} media with type ${mediaType}`);
         switch (mediaType){
-            case 'image':
-                if (files.length > imageLimit){
+            case MediaTypes.Image:
+                if (mediaArray.length > imageLimit){
                     warning(`More than ${imageLimit} images found, only the first ${imageLimit} will be sent`);
                 }
 
                 let i = 0;
-                files.forEach(file =>{
+                mediaArray.forEach(media =>{
                     if (i > imageLimit){
                         return;
                     }
 
-                    let attachment = new AttachmentBuilder(path.join(__dirname, file), file);
+                    let attachment = new AttachmentBuilder(path.join(__dirname, media.name), media.name);
                     attachments[attachments.length] = attachment;
                     if (i == 0){
-                        mainEmbed.setImage(`attachment://${file}`);
+                        mainEmbed.setImage(`attachment://${media.name}`);
                         embeds[i] = mainEmbed;
                     }
                     else{
                         embeds[i] = new EmbedBuilder()
                             .setURL(pr_url)
-                            .setImage(`attachment://${file}`);
+                            .setImage(`attachment://${media.name}`);
                     }
                     i++;
                 })
                 break;
-            case 'video':
-                if (files.length > videoLimit){
+            case MediaTypes.Video:
+                if (mediaArray.length > videoLimit){
                     warning(`More than ${videoLimit} images found, only the first ${videoLimit} will be sent`);
                 }
 
-                videoArray = files;
+                videoArray = mediaArray;
                 break;
             default:
                 break;
@@ -303,7 +305,7 @@ function deleteGitComments(text){
 
 /**
  * @param {string} text 
- * @returns {Promise<Map<string, string[]>>}
+ * @returns {Promise<Map<string, MediaData[]>>}
  */
 async function extractMedia(text){
     const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
@@ -314,18 +316,18 @@ async function extractMedia(text){
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
         console.log(`Try get file type from ${url}`);
-        let responce = await downloadMedia(url, __dirname, true);
-        if (responce == null){
+        let media = await downloadMedia(url, __dirname, true);
+        if (media == null){
             continue;
         }
         
-        if (mediaMap.has(responce.mediaType)){
-            let array = mediaMap.get(responce.mediaType);
-            array[array.length] = responce.fileName;
-            mediaMap.set(responce.mediaType, array);
+        if (mediaMap.has(media.type)){
+            let array = mediaMap.get(media.type);
+            array[array.length] = media;
+            mediaMap.set(media.type, array);
         }
         else{
-            mediaMap.set(responce.mediaType, [responce.fileName]);
+            mediaMap.set(media.type, [media]);
         }
         i++
     }
@@ -383,7 +385,7 @@ function getMediaType(extension){
  * @param {string} url 
  * @param {string} outputFolder
  * @param {boolean} recursive
- * @returns {Promise<{mediaType: string, fileName: string} | null>}
+ * @returns {Promise<MediaData | null>}
  */
 async function downloadMedia(url, outputFolder, recursive = true){
     if (!fs.existsSync(outputFolder)){
@@ -401,8 +403,8 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     let size = response.headers.get('Content-Length');
-    if (size == null || size > fileSizeLimit){
-        warning(`File size in ${url} is more than ${fileSizeLimit} bytes`);
+    if (size == null || size > messageSizeLimit){
+        warning(`File size in ${url} is more than ${messageSizeLimit} bytes`);
         return null;
     }
 
@@ -432,7 +434,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     console.log('File downloaded');
-    return {mediaType: mediaType, fileName: fileName};
+    return new MediaData(fileName, mediaType, Number(size));
 }
 
 /**
@@ -497,26 +499,49 @@ function getUrlType(url){
 
 /**
  * 
- * @param {string[]} files 
+ * @param {MediaData[]} mediaArray
  * @param {string} url
  */
-function sendVideos(files, url){
-    if (files.length <= 0){
+function sendVideos(mediaArray, url){
+    if (mediaArray.length <= 0){
         return;
     }
 
     let i = 0;
+    let buffer = 0;
     let attachment = new Array();
-    files.forEach(file =>{
+    mediaArray.forEach(media =>{
         if (i > videoLimit){
             return;
         }
 
-        attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, file), file);
+        if (media.type !== MediaTypes.Video){
+            return;
+        }
+
+        buffer += media.size;
+        if (buffer > messageSizeLimit){
+            return;
+        }
+
+        attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, media.name), media.name);
         i++;
     })
 
     webhookClient.send({
         files: attachment
     })
+}
+
+class MediaData{
+    /**
+     * @param {string} name 
+     * @param {string} type 
+     * @param {number} size 
+     */
+    constructor(name, type, size){
+        this.name = name;
+        this.type = type;
+        this.size = size;
+    }
 }
