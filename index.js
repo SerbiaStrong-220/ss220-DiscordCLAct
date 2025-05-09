@@ -362,7 +362,7 @@ function getVideoEmbed(videoUrl, url, title){
     console.log(`Video url is ${videoUrl}`);
     return {
         url: url,
-        video: { url: videoUrl },
+        video: { proxyURL: videoUrl },
         title: title,
         color: 0x3CB371
     }
