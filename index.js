@@ -36,6 +36,7 @@ const supportedMediaExtensions = new Map([
 
 const imageLimit = 10;
 const videoLimit = 4;
+const fileSizeLimit = 8388608; // 8 MB
 
 try {
     trySendMessage();
@@ -399,6 +400,12 @@ async function downloadMedia(url, outputFolder, recursive = true){
     if (response.redirected && recursive){
         warning(`Redirected, new url is ${response.url}`);
         return await downloadMedia(response.url, outputFolder, true);
+    }
+
+    let size = response.headers.get('Content-Length');
+    if (size == null || size > fileSizeLimit){
+        warning(`File size in ${url} is more than ${fileSizeLimit} bytes`);
+        return null;
     }
 
     let extension = response.headers.get('Content-Type')?.split('/')[1];
