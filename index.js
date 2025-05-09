@@ -368,7 +368,7 @@ function getMediaType(extension){
     }
 
     var type = null;
-    supportedMediaExtensions .forEach((extensions, mediaType) => {
+    supportedMediaExtensions.forEach((extensions, mediaType) => {
         if (extensions.includes(extension)){
             type = mediaType;
         }
@@ -398,13 +398,13 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     if (response.redirected && recursive){
-        warning(`Redirected, new url is ${response.url}`);
+        console.log(`Redirected, new url is ${response.url}`);
         return await downloadMedia(response.url, outputFolder, true);
     }
 
     let size = response.headers.get('Content-Length');
     if (size == null || size > messageSizeLimit){
-        warning(`File size in ${url} is more than ${messageSizeLimit} bytes`);
+        warning(`File size in ${url} is more than ${messageSizeLimit} bytes. Skip it`);
         return null;
     }
 
@@ -414,7 +414,6 @@ async function downloadMedia(url, outputFolder, recursive = true){
         return null;
     }
 
-    console.log(`Media type is ${mediaType}`);
     const fileNameRegex = new RegExp(`[^\/\s]*\.${extension}`);
     var fileName = fileNameRegex.exec(url)?.[0];
     if (fileName == null){
@@ -433,7 +432,6 @@ async function downloadMedia(url, outputFolder, recursive = true){
             return null;
     }
 
-    console.log('File downloaded');
     return new MediaData(fileName, mediaType, Number(size));
 }
 
@@ -508,7 +506,7 @@ function sendVideos(mediaArray, url){
     }
 
     let i = 0;
-    let buffer = 0;
+    let messageSize = 0;
     let attachment = new Array();
     mediaArray.forEach(media =>{
         if (i > videoLimit){
@@ -519,10 +517,12 @@ function sendVideos(mediaArray, url){
             return;
         }
 
-        buffer += media.size;
-        if (buffer > messageSizeLimit){
+        let newMessageSize = messageSize += media.size;
+        if (newMessageSize > messageSizeLimit){
+            warning(`${media.name} will exceed the message size by up to ${newMessageSize} bytes, which exceeds the limit of ${messageSizeLimit} bytes. Skip it`);
             return;
         }
+        messageSize = newMessageSize;
 
         attachment[attachment.length] = new AttachmentBuilder(path.join(__dirname, media.name), media.name);
         i++;
