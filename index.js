@@ -337,7 +337,7 @@ function setMediaInEmbed(type, url, embed){
             embed.setImage(url);
             break;
         case "video":
-            embed.data.video = { url: url };
+            embed.data.video = { proxy_url: url };
             break;
         default:
             break;
