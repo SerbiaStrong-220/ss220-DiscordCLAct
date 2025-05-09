@@ -363,6 +363,7 @@ async function downloadMedia(url, outputFolder, recurcive = true){
         return null;
     }
 
+    console.log(`media type is ${mediaType}`);
     const fileName = "video.mp4";
     await downloadHttps(url);
     console.log('File downloaded');
@@ -398,6 +399,7 @@ function downloadHttps(url){
             response.pipe(file);
             file.on('finish', () => {
                 file.close(() => console.log('Файл успешно загружен. Можете начинать чтение.'));
+                resolve;
             });
         });
     });
