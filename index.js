@@ -408,7 +408,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
         return null;
     }
 
-    let extension = getFileExtension(url);
+    let extension = response.headers.get('Content-Type')?.split('/')[1];
     let mediaType = getMediaType(extension);
     if (mediaType == null){
         warning(`Failed to get media type for ${extension}`)
@@ -425,10 +425,10 @@ async function downloadMedia(url, outputFolder, recursive = true){
     let urlType = getUrlType(url);
     switch (urlType){
         case 'http':
-            await downloadHttp(url, fileName, extension);
+            await downloadHttp(url, fileName);
             break;
         case 'https':
-            await downloadHttps(url, fileName, extension);
+            await downloadHttps(url, fileName);
             break;
         default:
             warning(`Url type \"{urlType}\" doesn't supported`);
@@ -445,31 +445,17 @@ async function downloadMedia(url, outputFolder, recursive = true){
 function getFileName(url){
     let name = path.basename(url);
     name = name.split('?')[0]; // without query string
-    name = name.split('.')[0]; // without extension
     return name;
 }
 
 /**
  * @param {string} url 
- * @returns {string}
- */
-function getFileExtension(url){
-    let extension = path.basename(url);
-    extension = extension.split('?')[0]; // without query string
-    extension = extension.split('.')[1]; // after name
-    return extension;
-}
-
-/**
- * 
- * @param {string} url 
  * @param {string} fileName
- * @param {string} extension
  * @returns {Promise<void>}
  */
-function downloadHttp(url, fileName, extension){
+function downloadHttp(url, fileName){
     return new Promise(resolve => {
-        const savePath = path.join(__dirname, `${fileName}.${extension}`);
+        const savePath = path.join(__dirname, fileName);
         const file = fs.createWriteStream(savePath);
         const request = http.get(url, async response => {
             response.pipe(file);
@@ -481,15 +467,13 @@ function downloadHttp(url, fileName, extension){
 }
 
 /**
- * 
  * @param {string} url 
  * @param {string} fileName
- * @param {string} extension
  * @returns {Promise<void>}
  */
-function downloadHttps(url, fileName, extension){
+function downloadHttps(url, fileName){
     return new Promise(resolve => {
-        const savePath = path.join(__dirname, `${fileName}.${extension}`);
+        const savePath = path.join(__dirname, fileName);
         const file = fs.createWriteStream(savePath);
         const request = https.get(url, async response => {
             response.pipe(file);
