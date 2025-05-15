@@ -415,6 +415,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
         return null;
     }
 
+    console.log(`extension is ${extension}`);
     const fileNameRegex = new RegExp(`[^\/\s]*\.${extension}`);
     var fileName = fileNameRegex.exec(url)?.[0];
     if (fileName == null){
