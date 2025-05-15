@@ -453,11 +453,12 @@ function getFileName(url){
  * 
  * @param {string} url 
  * @param {string} fileName
+ * @param {string} extension
  * @returns {Promise<void>}
  */
-function downloadHttp(url, fileName){
+function downloadHttp(url, fileName, extension){
     return new Promise(resolve => {
-        const savePath = path.join(__dirname, fileName);
+        const savePath = path.join(__dirname, `${fileName}.${extension}`);
         const file = fs.createWriteStream(savePath);
         const request = http.get(url, async response => {
             response.pipe(file);
@@ -472,11 +473,12 @@ function downloadHttp(url, fileName){
  * 
  * @param {string} url 
  * @param {string} fileName
+ * @param {string} extension
  * @returns {Promise<void>}
  */
-function downloadHttps(url, fileName){
+function downloadHttps(url, fileName, extension){
     return new Promise(resolve => {
-        const savePath = path.join(__dirname, fileName);
+        const savePath = path.join(__dirname, `${fileName}.${extension}`);
         const file = fs.createWriteStream(savePath);
         const request = https.get(url, async response => {
             response.pipe(file);
