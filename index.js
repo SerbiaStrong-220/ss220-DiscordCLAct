@@ -320,7 +320,6 @@ function deleteCLIgnore(text){
     const tag = "CLIgnore";
     const CLIgnoreRegex = RegExp(`<!--${tag}-->[\\s\\S]*<!--\/${tag}-->`, 'gm');
 
-    console.log(CLIgnoreRegex);
     return text.replaceAll(CLIgnoreRegex, '').trim();
 }
 
@@ -416,7 +415,6 @@ async function downloadMedia(url, outputFolder, recursive = true){
         return null;
     }
 
-    console.log(`extension is ${extension}`);
     var fileName = getFileName(url);
     if (fileName == null){
         warning(`Failed to get file name from ${url}`);
