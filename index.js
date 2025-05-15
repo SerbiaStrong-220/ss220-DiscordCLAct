@@ -335,11 +335,13 @@ async function extractMedia(text){
     let result;
     while((result = urlRegex.exec(text)) != null){
         let url = result[0];
-        console.log(`Try get file type from ${url}`);
+        console.log(`Media-loader: Try get media from ${url}`);
         let media = await downloadMedia(url, __dirname, true);
         if (media == null){
+            console.log(`Media-loader: Skipped`);
             continue;
         }
+        console.log(`Media-loader: Success`);
         
         if (mediaMap.has(media.type)){
             let array = mediaMap.get(media.type);
@@ -372,7 +374,7 @@ function getMediaType(extension){
     })
 
     if (type == null){
-        warning(`Extension ${extension} doesn't supported`);
+        console.log(`Extension ${extension} doesn't supported`);
     }
     return type;
 }
@@ -391,6 +393,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
 
     const response = await fetch(url);
     if (!response.ok){
+        warning(`No response from ${url}`);
         return null;
     }
 
@@ -401,19 +404,21 @@ async function downloadMedia(url, outputFolder, recursive = true){
 
     let size = response.headers.get('Content-Length');
     if (size == null || size > messageSizeLimit){
-        warning(`File size in ${url} is more than ${messageSizeLimit} bytes. Skip it`);
+        warning(`File size in ${url} is more than ${messageSizeLimit} bytes`);
         return null;
     }
 
     let extension = response.headers.get('Content-Type')?.split('/')[1];
     let mediaType = getMediaType(extension);
     if (mediaType == null){
+        warning(`Failed to get media type for ${extension}`)
         return null;
     }
 
     const fileNameRegex = new RegExp(`[^\/\s]*\.${extension}`);
     var fileName = fileNameRegex.exec(url)?.[0];
     if (fileName == null){
+        warning(`Failed to get file name from ${url}`);
         return null;
     }
 
@@ -426,6 +431,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
             await downloadHttps(url, fileName);
             break;
         default:
+            warning(`Url type \"{urlType}\" doesn't supported`);
             return null;
     }
 
