@@ -408,7 +408,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
         return null;
     }
 
-    let extension = response.headers.get('Content-Type')?.split('/')[1];
+    let extension = getFileExtension(url);
     let mediaType = getMediaType(extension);
     if (mediaType == null){
         warning(`Failed to get media type for ${extension}`)
@@ -447,6 +447,17 @@ function getFileName(url){
     name = name.split('?')[0]; // without query string
     name = name.split('.')[0]; // without extension
     return name;
+}
+
+/**
+ * @param {string} url 
+ * @returns {string}
+ */
+function getFileExtension(url){
+    let extension = path.basename(url);
+    extension = extension.split('?')[0]; // without query string
+    extension = extension.split('.')[1]; // after name
+    return extension;
 }
 
 /**
