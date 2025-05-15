@@ -416,8 +416,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     console.log(`extension is ${extension}`);
-    const fileNameRegex = new RegExp(`[^\/\s]*\.${extension}`);
-    var fileName = fileNameRegex.exec(url)?.[0];
+    var fileName = getFileName(url);
     if (fileName == null){
         warning(`Failed to get file name from ${url}`);
         return null;
@@ -437,6 +436,17 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     return new MediaData(fileName, mediaType, Number(size));
+}
+
+/**
+ * @param {string} url 
+ * @returns {string}
+ */
+function getFileName(url){
+    let name = path.basename(url);
+    name = name.split('?')[0]; // without query string
+    name = name.split('.')[0]; // without extension
+    return name;
 }
 
 /**
