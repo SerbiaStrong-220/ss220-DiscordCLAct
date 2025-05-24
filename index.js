@@ -318,7 +318,7 @@ function deleteGitComments(text){
  */
 function deleteCLIgnore(text){
     const tag = "CLIgnore";
-    const CLIgnoreRegex = RegExp(`<!--${tag}-->[\\s\\S]*<!--\/${tag}-->`, 'gm');
+    const CLIgnoreRegex = RegExp(`<!--${tag}-->[\\s\\S]*?<!--\/${tag}-->`, 'gm');
 
     return text.replaceAll(CLIgnoreRegex, '').trim();
 }
