@@ -157,7 +157,7 @@ async function trySendMessage(){
 /**
  * @param {string} text
  * @param {string} author The author of the changes, which will be used unless otherwise specified in the changelog
- * @returns {Map<string, string> | null} 
+ * @returns {Map<string, string> | null}
  */
 function extractAuthorsInfoMap(text, author = "Неизвестно"){
     var clStrings = extractCL(text);
@@ -205,8 +205,8 @@ function extractAuthorsInfoMap(text, author = "Неизвестно"){
             let curInfo = infoArray[i];
 
             if (typeof curInfo !== 'string' ||
-                curInfo === null || 
-                curInfo === "") 
+                curInfo === null ||
+                curInfo === "")
                 continue;
 
             const dashRegex = /\s*-\s*(?=\w+:)/g;
@@ -266,7 +266,7 @@ function extractCL(text){
 }
 
 /**
- * @param {string} text 
+ * @param {string} text
  * @returns {string[] | null}
  */
 function extractAuthors(text){
@@ -277,15 +277,15 @@ function extractAuthors(text){
 
     authorLine = authorLine[0].trim();
     if (authorLine === "") return null;
-    
+
     let authorsArray = authorLine.split(',');
     authorsArray.filter(a => a !== "");
     return authorsArray;
 }
 
 /**
- * 
- * @param {string} text 
+ *
+ * @param {string} text
  * @returns {string[]}
  */
 function extractInfoLines(text){
@@ -324,7 +324,7 @@ function deleteCLIgnore(text){
 }
 
 /**
- * @param {string} text 
+ * @param {string} text
  * @returns {Promise<Map<string, MediaData[]>>}
  */
 async function extractMedia(text){
@@ -342,7 +342,7 @@ async function extractMedia(text){
             continue;
         }
         console.log(`Media-loader: Success`);
-        
+
         if (mediaMap.has(media.type)){
             let array = mediaMap.get(media.type);
             array[array.length] = media;
@@ -380,8 +380,8 @@ function getMediaType(extension){
 }
 
 /**
- * 
- * @param {string} url 
+ *
+ * @param {string} url
  * @param {string} outputFolder
  * @param {boolean} recursive
  * @returns {Promise<MediaData | null>}
@@ -393,7 +393,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
 
     const response = await fetch(url);
     if (!response.ok){
-        warning(`No response from ${url}`);
+        warning(`Network response from ${url} wasn't ok, status: ${response.status}`);
         return null;
     }
 
@@ -438,7 +438,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
 }
 
 /**
- * @param {string} url 
+ * @param {string} url
  * @returns {string}
  */
 function getFileName(url){
@@ -448,7 +448,7 @@ function getFileName(url){
 }
 
 /**
- * @param {string} url 
+ * @param {string} url
  * @param {string} fileName
  * @returns {Promise<void>}
  */
@@ -466,7 +466,7 @@ function downloadHttp(url, fileName){
 }
 
 /**
- * @param {string} url 
+ * @param {string} url
  * @param {string} fileName
  * @returns {Promise<void>}
  */
@@ -484,8 +484,8 @@ function downloadHttps(url, fileName){
 }
 
 /**
- * 
- * @param {fs.WriteStream} writeStream 
+ *
+ * @param {fs.WriteStream} writeStream
  * @returns {Promise<void>}
  */
 function waitForFinish(writeStream) {
@@ -496,8 +496,8 @@ function waitForFinish(writeStream) {
 }
 
 /**
- * 
- * @param {string} url 
+ *
+ * @param {string} url
  * @returns {string?}
  */
 function getUrlType(url){
@@ -506,7 +506,7 @@ function getUrlType(url){
 }
 
 /**
- * 
+ *
  * @param {MediaData[]} mediaArray
  * @param {string} url
  */
@@ -545,9 +545,9 @@ function sendVideos(mediaArray, url){
 
 class MediaData{
     /**
-     * @param {string} name 
-     * @param {string} type 
-     * @param {number} size 
+     * @param {string} name
+     * @param {string} type
+     * @param {number} size
      */
     constructor(name, type, size){
         this.name = name;
