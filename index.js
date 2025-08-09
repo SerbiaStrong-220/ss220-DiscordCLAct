@@ -43,13 +43,26 @@ const imageLimit = 10;
 const videoLimit = 10;
 const messageSizeLimit = 8388608; // 8 MB
 
+class MediaData{
+    /**
+     * @param {string} name
+     * @param {string} type
+     * @param {number} size
+     */
+    constructor(name, type, size){
+        this.name = name;
+        this.type = type;
+        this.size = size;
+    }
+}
+
 try {
-    await trySendMessage();
+    await sendChangelog();
 } catch (error) {
     setFailed(error.message);
 }
 
-async function trySendMessage(){
+async function sendChangelog(){
     console.info(`Attempt to send a GET-request to https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}\n`)
     const pull_request = await client.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
         owner: owner,
@@ -361,22 +374,42 @@ async function extractMedia(text){
 }
 
 /**
- * @param {string?} extension
- * @returns {string?}
+ *
+ * @param {string} url
+ * @param {string} outputFolder
+ * @param {boolean} recursive
+ * @returns {Promise<MediaData | null>}
  */
-function getMediaType(extension){
-    if (extension == null){
-        return null;
+async function downloadMedia(url, outputFolder){
+    if (!fs.existsSync(outputFolder)){
+        fs.mkdirSync(outputFolder, { recursive: true });
     }
 
-    var type = null;
-    supportedMediaExtensions.forEach((extensions, mediaType) => {
-        if (extensions.includes(extension)){
-            type = mediaType;
-        }
-    })
+    try {
+        const {extension, buffer} = await sendRequest(url);
+        let size = buffer.length;
 
-    return type;
+        console.log('Downloaded file size:', size);
+        if (size > messageSizeLimit){
+            warning(`File size in "${url}" is more than ${messageSizeLimit} bytes!`);
+            return null;
+        }
+
+        let mediaType = getMediaType(extension);
+        if (mediaType == null){
+            warning(`Failed to get media type for "${extension}"!`)
+            return null;
+        }
+
+        let fileName = generateFileName(extension);
+        const savePath = path.join(outputFolder, fileName);
+        await writeFileAsync(savePath, buffer);
+        return new MediaData(fileName, mediaType, size);
+    }
+    catch (err){
+        warning('Download failed:', err);
+        return null;
+    }
 }
 
 /**
@@ -429,42 +462,22 @@ function sendRequest(fileUrl){
 }
 
 /**
- *
- * @param {string} url
- * @param {string} outputFolder
- * @param {boolean} recursive
- * @returns {Promise<MediaData | null>}
+ * @param {string?} extension
+ * @returns {string?}
  */
-async function downloadMedia(url, outputFolder){
-    if (!fs.existsSync(outputFolder)){
-        fs.mkdirSync(outputFolder, { recursive: true });
-    }
-
-    try {
-        const {extension, buffer} = await sendRequest(url);
-        let size = buffer.length;
-
-        console.log('Downloaded file size:', size);
-        if (size > messageSizeLimit){
-            warning(`File size in "${url}" is more than ${messageSizeLimit} bytes!`);
-            return null;
-        }
-
-        let mediaType = getMediaType(extension);
-        if (mediaType == null){
-            warning(`Failed to get media type for "${extension}"!`)
-            return null;
-        }
-
-        let fileName = generateFileName(extension);
-        const savePath = path.join(outputFolder, fileName);
-        await writeFileAsync(savePath, buffer);
-        return new MediaData(fileName, mediaType, size);
-    }
-    catch (err){
-        warning('Download failed:', err);
+function getMediaType(extension){
+    if (extension == null){
         return null;
     }
+
+    var type = null;
+    supportedMediaExtensions.forEach((extensions, mediaType) => {
+        if (extensions.includes(extension)){
+            type = mediaType;
+        }
+    })
+
+    return type;
 }
 
 /**
@@ -513,17 +526,4 @@ function sendVideos(mediaArray){
     webhookClient.send({
         files: attachment
     })
-}
-
-class MediaData{
-    /**
-     * @param {string} name
-     * @param {string} type
-     * @param {number} size
-     */
-    constructor(name, type, size){
-        this.name = name;
-        this.type = type;
-        this.size = size;
-    }
 }
