@@ -400,7 +400,7 @@ function sendRequest(fileUrl){
     const req = https.request(options, (res) => {
       // Handle redirects
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return resolve(httpsReq(res.headers.location));
+        return resolve(sendRequest(res.headers.location));
       }
 
       let extension;
