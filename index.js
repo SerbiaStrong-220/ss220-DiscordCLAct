@@ -427,15 +427,17 @@ async function downloadMedia(url, outputFolder, recursive = true){
     try {
         const fileBuffer = await httpsReq(url);
         console.log('Downloaded file size:', fileBuffer.length);
+
+        const savePath = path.join(__dirname, 'test.png');
+        await writeFileAsync(savePath, fileBuffer);
+
+        return new MediaData('test.png', 'image', fileBuffer.length);
     }
     catch (err){
         console.error('Download failed:', err);
     }
 
-    const savePath = path.join(__dirname, 'test.png');
-    await writeFileAsync(savePath, fileBuffer);
-
-    return new MediaData('test.png', 'image', fileBuffer.length);
+    return null;
 
     const response = await fetch(url);
     if (!response.ok){
