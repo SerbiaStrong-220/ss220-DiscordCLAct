@@ -44,7 +44,7 @@ const videoLimit = 10;
 const messageSizeLimit = 8388608; // 8 MB
 
 try {
-    trySendMessage();
+    await trySendMessage();
 } catch (error) {
     setFailed(error.message);
 }
