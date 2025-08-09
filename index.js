@@ -400,6 +400,9 @@ function httpsReq(fileUrl){
         return resolve(httpsReq(res.headers.location));
       }
 
+      let contentType = res.headers['content-type'];
+
+      console.log(`contentType is ${contentType}`);
       let data = [];
       res.on('data', chunk => data.push(chunk));
       res.on('end', () => {
