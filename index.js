@@ -6,7 +6,9 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import https from 'https';
+import util from 'util';
 
+const writeFileAsync = util.promisify(fs.writeFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -429,7 +431,11 @@ async function downloadMedia(url, outputFolder, recursive = true){
     catch (err){
         console.error('Download failed:', err);
     }
-    return null;
+
+    const savePath = path.join(__dirname, 'test.png');
+    await writeFileAsync(savePath, fileBuffer);
+
+    return new MediaData('test.png', 'image', fileBuffer.length);
 
     const response = await fetch(url);
     if (!response.ok){
