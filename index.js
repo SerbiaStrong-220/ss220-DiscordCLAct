@@ -330,7 +330,7 @@ function deleteCLIgnore(text){
  * @returns {Promise<Map<string, MediaData[]>>}
  */
 async function extractMedia(text){
-    const urlRegex = /(http|https):\/\/[^)\]\s]+/gm;
+    const urlRegex = /(http|https):\/\/[^")\]\s]+/gm;
 
     let mediaMap = new Map();
     let i = 0;
