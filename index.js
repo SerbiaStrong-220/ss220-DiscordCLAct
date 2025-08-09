@@ -379,6 +379,37 @@ function getMediaType(extension){
     return type;
 }
 
+function httpsReq(url){
+  return new Promise((resolve, reject) => {
+    const url = new URL(fileUrl);
+
+    const options = {
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0', // avoids some GitHub 403s
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      // Handle redirects
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(httpsReq(res.headers.location));
+      }
+
+      let data = [];
+      res.on('data', chunk => data.push(chunk));
+      res.on('end', () => {
+        resolve(Buffer.concat(data)); // raw file data
+      });
+    });
+
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 /**
  *
  * @param {string} url
@@ -390,6 +421,15 @@ async function downloadMedia(url, outputFolder, recursive = true){
     if (!fs.existsSync(outputFolder)){
         fs.mkdirSync(outputFolder, { recursive: true });
     }
+
+    try {
+        const fileBuffer = await httpsReq(url);
+        console.log('Downloaded file size:', fileBuffer.length);
+    }
+    catch{
+        console.error('Download failed:', err);
+    }
+    return null;
 
     const response = await fetch(url);
     if (!response.ok){
