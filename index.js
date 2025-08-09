@@ -7,6 +7,7 @@ import path from 'path';
 import http from 'http';
 import https from 'https';
 import util from 'util';
+import crypto from 'crypto';
 
 const writeFileAsync = util.promisify(fs.writeFile);
 const __filename = fileURLToPath(import.meta.url);
@@ -360,8 +361,8 @@ async function extractMedia(text){
 }
 
 /**
- * @param {string?} contentType
- * @returns {string?>}
+ * @param {string?} extension
+ * @returns {string?}
  */
 function getMediaType(extension){
     if (extension == null){
@@ -375,13 +376,15 @@ function getMediaType(extension){
         }
     })
 
-    if (type == null){
-        console.log(`Extension ${extension} doesn't supported`);
-    }
     return type;
 }
 
-function httpsReq(fileUrl){
+/**
+ *
+ * @param {string} fileUrl
+ * @returns {Promise<{extension: string, buffer: Buffer<ArrayBuffer>}>}
+ */
+function sendRequest(fileUrl){
   return new Promise((resolve, reject) => {
     const url = new URL(fileUrl);
 
@@ -400,13 +403,23 @@ function httpsReq(fileUrl){
         return resolve(httpsReq(res.headers.location));
       }
 
+      let extension;
       let contentType = res.headers['content-type'];
+      if (contentType.startsWith('image/')){
+        extension = 'png';
+      }
+      else if (contentType.startsWith('video/')){
+        extension = 'mp4';
+      }
 
-      console.log(`contentType is ${contentType}`);
+      if (extension == undefined || extension == null){
+        reject(`Content-Type "${contentType}" doesn't supported!`);
+      }
+
       let data = [];
       res.on('data', chunk => data.push(chunk));
       res.on('end', () => {
-        resolve(Buffer.concat(data)); // raw file data
+        resolve({extension: extension, buffer: Buffer.concat(data)});
       });
     });
 
@@ -422,22 +435,34 @@ function httpsReq(fileUrl){
  * @param {boolean} recursive
  * @returns {Promise<MediaData | null>}
  */
-async function downloadMedia(url, outputFolder, recursive = true){
+async function downloadMedia(url, outputFolder){
     if (!fs.existsSync(outputFolder)){
         fs.mkdirSync(outputFolder, { recursive: true });
     }
 
     try {
-        const fileBuffer = await httpsReq(url);
-        console.log('Downloaded file size:', fileBuffer.length);
+        const {extension, buffer} = await sendRequest(url);
+        let size = buffer.length;
 
-        const savePath = path.join(__dirname, 'test.png');
-        await writeFileAsync(savePath, fileBuffer);
+        console.log('Downloaded file size:', size);
+        if (size > messageSizeLimit){
+            warning(`File size in "${url}" is more than ${messageSizeLimit} bytes`);
+            return null;
+        }
 
-        return new MediaData('test.png', 'image', fileBuffer.length);
+        let mediaType = getMediaType(extension);
+        if (mediaType == null){
+            warning(`Failed to get media type for "${extension}"`)
+            return null;
+        }
+
+        let fileName = generateFileName(extension);
+        const savePath = path.join(outputFolder, fileName);
+        await writeFileAsync(savePath, buffer);
+        return new MediaData(fileName, mediaType, size);
     }
     catch (err){
-        console.error('Download failed:', err);
+        warning('Download failed:', err);
     }
 
     return null;
@@ -486,6 +511,17 @@ async function downloadMedia(url, outputFolder, recursive = true){
     }
 
     return new MediaData(fileName, mediaType, Number(size));
+}
+
+/**
+ *
+ * @param {string} extension
+ * @returns {string}
+ */
+function generateFileName(extension){
+    const randomPart = crypto.randomBytes(4).toString('hex');
+    const timestamp = Date.now();
+    return `${randomPart}_${timestamp}.${extension}`;s
 }
 
 /**
