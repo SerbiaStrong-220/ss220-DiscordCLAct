@@ -379,7 +379,7 @@ function getMediaType(extension){
     return type;
 }
 
-function httpsReq(url){
+function httpsReq(fileUrl){
   return new Promise((resolve, reject) => {
     const url = new URL(fileUrl);
 
