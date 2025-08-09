@@ -426,7 +426,7 @@ async function downloadMedia(url, outputFolder, recursive = true){
         const fileBuffer = await httpsReq(url);
         console.log('Downloaded file size:', fileBuffer.length);
     }
-    catch{
+    catch (err){
         console.error('Download failed:', err);
     }
     return null;
