@@ -446,13 +446,13 @@ async function downloadMedia(url, outputFolder){
 
         console.log('Downloaded file size:', size);
         if (size > messageSizeLimit){
-            warning(`File size in "${url}" is more than ${messageSizeLimit} bytes`);
+            warning(`File size in "${url}" is more than ${messageSizeLimit} bytes!`);
             return null;
         }
 
         let mediaType = getMediaType(extension);
         if (mediaType == null){
-            warning(`Failed to get media type for "${extension}"`)
+            warning(`Failed to get media type for "${extension}"!`)
             return null;
         }
 
@@ -463,54 +463,8 @@ async function downloadMedia(url, outputFolder){
     }
     catch (err){
         warning('Download failed:', err);
-    }
-
-    return null;
-
-    const response = await fetch(url);
-    if (!response.ok){
-        warning(`Network response from ${url} wasn't ok, status: ${response.status}`);
         return null;
     }
-
-    if (response.redirected && recursive){
-        console.log(`Redirected, new url is ${response.url}`);
-        return await downloadMedia(response.url, outputFolder, true);
-    }
-
-    let size = response.headers.get('Content-Length');
-    if (size == null || size > messageSizeLimit){
-        warning(`File size in ${url} is more than ${messageSizeLimit} bytes`);
-        return null;
-    }
-
-    let extension = response.headers.get('Content-Type')?.split('/')[1];
-    let mediaType = getMediaType(extension);
-    if (mediaType == null){
-        warning(`Failed to get media type for ${extension}`)
-        return null;
-    }
-
-    var fileName = getFileName(url);
-    if (fileName == null){
-        warning(`Failed to get file name from ${url}`);
-        return null;
-    }
-
-    let urlType = getUrlType(url);
-    switch (urlType){
-        case 'http':
-            await downloadHttp(url, fileName);
-            break;
-        case 'https':
-            await downloadHttps(url, fileName);
-            break;
-        default:
-            warning(`Url type \"{urlType}\" doesn't supported`);
-            return null;
-    }
-
-    return new MediaData(fileName, mediaType, Number(size));
 }
 
 /**
@@ -525,79 +479,10 @@ function generateFileName(extension){
 }
 
 /**
- * @param {string} url
- * @returns {string}
- */
-function getFileName(url){
-    let name = path.basename(url);
-    name = name.split('?')[0]; // without query string
-    return name;
-}
-
-/**
- * @param {string} url
- * @param {string} fileName
- * @returns {Promise<void>}
- */
-function downloadHttp(url, fileName){
-    return new Promise(resolve => {
-        const savePath = path.join(__dirname, fileName);
-        const file = fs.createWriteStream(savePath);
-        const request = http.get(url, async response => {
-            response.pipe(file);
-            await waitForFinish(file);
-            console.log(`File saved in ${savePath}`);
-            resolve();
-        });
-    });
-}
-
-/**
- * @param {string} url
- * @param {string} fileName
- * @returns {Promise<void>}
- */
-function downloadHttps(url, fileName){
-    return new Promise(resolve => {
-        const savePath = path.join(__dirname, fileName);
-        const file = fs.createWriteStream(savePath);
-        const request = https.get(url, async response => {
-            response.pipe(file);
-            await waitForFinish(file);
-            console.log(`File saved in ${savePath}`);
-            resolve();
-        });
-    });
-}
-
-/**
- *
- * @param {fs.WriteStream} writeStream
- * @returns {Promise<void>}
- */
-function waitForFinish(writeStream) {
-    return new Promise((resolve, reject) => {
-        writeStream.on('finish', resolve);
-        writeStream.on('error', reject);
-    });
-}
-
-/**
- *
- * @param {string} url
- * @returns {string?}
- */
-function getUrlType(url){
-    const urlTypeRegex = /^[^:]*/;
-    return urlTypeRegex.exec(url)?.[0];
-}
-
-/**
  *
  * @param {MediaData[]} mediaArray
- * @param {string} url
  */
-function sendVideos(mediaArray, url){
+function sendVideos(mediaArray){
     if (mediaArray.length <= 0){
         return;
     }
@@ -616,7 +501,7 @@ function sendVideos(mediaArray, url){
 
         let newMessageSize = messageSize += media.size;
         if (newMessageSize > messageSizeLimit){
-            warning(`${media.name} will exceed the message size by up to ${newMessageSize} bytes, which exceeds the limit of ${messageSizeLimit} bytes. Skip it`);
+            warning(`${media.name} will exceed the message size by up to ${newMessageSize} bytes, which exceeds the limit of ${messageSizeLimit} bytes! Skiping it`);
             return;
         }
         messageSize = newMessageSize;
