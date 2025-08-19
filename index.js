@@ -438,7 +438,11 @@ function sendRequest(fileUrl){
 
       let extension;
       let contentType = res.headers['content-type'];
-      if (contentType.startsWith('image/')){
+
+      if (contentType.endsWith('/gif')){
+        extension = 'gif';
+      }
+      else if (contentType.startsWith('image/')){
         extension = 'png';
       }
       else if (contentType.startsWith('video/')){
