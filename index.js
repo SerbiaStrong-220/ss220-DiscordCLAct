@@ -4,7 +4,6 @@ import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
-import http from 'http';
 import https from 'https';
 import util from 'util';
 import crypto from 'crypto';
@@ -15,6 +14,9 @@ const __dirname = path.dirname(__filename);
 
 const webhook_id = getInput('webhook_id');
 const webhook_token = getInput('webhook_token');
+const webhook_username = 'SS220 Changelogger';
+const webhook_avatarUrl = 'https://raw.githubusercontent.com/SerbiaStrong-220/ss220-DiscordCLAct/refs/heads/main/logo.png';
+
 const github_token = getInput('github_token');
 
 const [owner, repo] = getInput('repo').split('/');
@@ -157,12 +159,16 @@ async function sendChangelog(){
 
     if (attachments.length > 0){
         webhookClient.send({
+            username: webhook_username,
+            avatarURL: webhook_avatarUrl,
             embeds: embeds,
             files: attachments
         });
     }
     else{
         webhookClient.send({
+            username: webhook_username,
+            avatarURL: webhook_avatarUrl,
             embeds: embeds
         });
     }
@@ -528,6 +534,8 @@ function sendVideos(mediaArray){
     })
 
     webhookClient.send({
+        username: webhook_username,
+        avatarURL: webhook_avatarUrl,
         files: attachment
     })
 }
