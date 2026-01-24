@@ -19,6 +19,8 @@ const webhook_avatarUrl = 'https://raw.githubusercontent.com/SerbiaStrong-220/ss
 
 const github_token = getInput('github_token');
 
+
+
 const [owner, repo] = getInput('repo').split('/');
 const pull_number = getInput('pull_number') === ''
     ? context.issue.number
