@@ -7,7 +7,7 @@ import * as https from 'https';
 import * as path from 'path';
 import * as crypto from 'crypto';
 
-const WEBHOOR_URL = core.getInput("webhook_url");
+const WEBHOOK_URL = core.getInput("webhook_url");
 const GITHUB_TOKEN = core.getInput("github_token");
 const PR_URL = core.getInput("pull_request_url");
 
@@ -50,9 +50,9 @@ try {
 }
 
 async function run(){
-    core.info(`WEBHOOK_URL: "${WEBHOOR_URL}"`);
+    core.info(`WEBHOOK_URL: "${WEBHOOK_URL}"`);
 
-    const webhook_client = new discord.WebhookClient({ url: WEBHOOR_URL });
+    const webhook_client = new discord.WebhookClient({ url: WEBHOOK_URL });
     const git_client = github.getOctokit(GITHUB_TOKEN);
 
     core.info(`Attempt to send a GET-request to ${PR_URL}`);
