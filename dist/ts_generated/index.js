@@ -35,10 +35,8 @@ try {
     exit(0);
 }
 catch (e) {
-    if (e instanceof Error) {
-        core.setFailed(`${e.message}\n${e.stack}`);
-    }
-    core.setFailed(`Unknown error`);
+    let message = e instanceof Error ? `${e.message}\n${e.stack}` : String(e);
+    core.setFailed(message);
     exit(1);
 }
 async function run() {
