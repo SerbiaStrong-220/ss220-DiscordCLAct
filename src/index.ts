@@ -163,20 +163,21 @@ async function run(){
         }
     }
 
-    let options: discord.WebhookMessageCreateOptions = {embeds: embeds};
-    if (WEBHOOK_USERNAME !== ""){
-        options.username = WEBHOOK_USERNAME;
+    let baseMessageOptions: discord.WebhookMessageCreateOptions = {};
+    if (WEBHOOK_USERNAME !== ''){
+        baseMessageOptions.username = WEBHOOK_USERNAME;
     }
 
     if (WEBHOOK_AVATAR_URL !== ""){
-        options.avatarURL = WEBHOOK_AVATAR_URL;
+        baseMessageOptions.avatarURL = WEBHOOK_AVATAR_URL;
     }
 
+    let mainMessageOptions: discord.WebhookMessageCreateOptions = { ...baseMessageOptions };
     if (attachments.length > 0){
-        options.files = attachments;
+        mainMessageOptions.files = attachments;
     }
 
-    await webhook_client.send(options);
+    await webhook_client.send(mainMessageOptions);
 
 
     // Attach videos
@@ -205,11 +206,9 @@ async function run(){
             attachments.push(new discord.AttachmentBuilder(video.path, {name: video.name}));
         }
 
-        await webhook_client.send({
-            username: WEBHOOK_USERNAME,
-            avatarURL: WEBHOOK_AVATAR_URL,
-            files: attachments
-        });
+        let videoMessageOptions: discord.WebhookMessageCreateOptions = { ...baseMessageOptions };
+        videoMessageOptions.files = attachments;
+        await webhook_client.send(videoMessageOptions);
     }
 }
 
