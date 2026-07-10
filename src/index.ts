@@ -164,11 +164,11 @@ async function run(){
     }
 
     let options: discord.WebhookMessageCreateOptions = {embeds: embeds};
-    if (WEBHOOK_USERNAME !== ''){
+    if (WEBHOOK_USERNAME !== ""){
         options.username = WEBHOOK_USERNAME;
     }
 
-    if (WEBHOOK_AVATAR_URL !== ''){
+    if (WEBHOOK_AVATAR_URL !== ""){
         options.avatarURL = WEBHOOK_AVATAR_URL;
     }
 
