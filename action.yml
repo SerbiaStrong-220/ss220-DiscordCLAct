@@ -1,23 +1,19 @@
 name: 'Discord changelog action'
 description: 'Extracts the changelog from the text and sends it to Discord'
 inputs:
-  webhook_id:
-    description: Id of the discord webhook
+  webhook_url:
     required: true
-  webhook_token:
-    description: The secret of the discord webhook
+  pull_request_url:
     required: true
   github_token:
-    description:  A github token
     required: false
-    default: ${{ github.token }} 
-  repo:
-    description: Repository name
+    default: ${{ github.token }}
+  webhook_username:
     required: false
-    default: ${{ github.repository }}
-  pull_number:
-    description: The number of the pull request whose changelog needs to be published
+  webhook_avatar_url:
+    required: false
+  changelog_replace_data:
     required: false
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/action/index.js'

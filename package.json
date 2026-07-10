@@ -1,27 +1,20 @@
 {
-  "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.0",
-    "discord.js": "^14.17.3"
-  },
   "name": "ss220-discordclact",
-  "version": "1.0.0",
-  "description": "<p align=\"center\"> <img alt=\"Space Station 14\" width=\"350\" height=\"350\" src=\"https://raw.githubusercontent.com/SerbiaStrong-220/space-station-14/master/logo.png\" /></p>",
+  "version": "1.1.0",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/action/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "ncc build -o dist index.js"
+  "build": "tsc && ncc build dist/ts_generated/index.js -o dist/action"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SerbiaStrong-220/ss220-DiscordCLAct.git"
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@vercel/ncc": "^0.44.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SerbiaStrong-220/ss220-DiscordCLAct/issues"
-  },
-  "homepage": "https://github.com/SerbiaStrong-220/ss220-DiscordCLAct#readme"
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "discord.js": "^14.26.5"
+  }
 }
