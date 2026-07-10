@@ -12,7 +12,7 @@ inputs:
     required: false
   webhook_avatar_url:
     required: false
-  webhook_embed_color":
+  webhook_embed_color:
     required: false
     default: '#3CB371'
   changelog_replace_data:
