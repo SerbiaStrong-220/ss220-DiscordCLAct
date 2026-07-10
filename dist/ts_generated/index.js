@@ -57,6 +57,13 @@ if (rawReplaceData !== '') {
 else {
     CHANGELOG_REPLACE_DATA = defaultReplaceData;
 }
+const BASE_MESSAGE_OPTIONS = {};
+if (WEBHOOK_USERNAME !== '') {
+    BASE_MESSAGE_OPTIONS.username = WEBHOOK_USERNAME;
+}
+if (WEBHOOK_AVATAR_URL !== "") {
+    BASE_MESSAGE_OPTIONS.avatarURL = WEBHOOK_AVATAR_URL;
+}
 try {
     await run();
     exit(0);
@@ -139,14 +146,8 @@ async function run() {
             }
         }
     }
-    let baseMessageOptions = {};
-    if (WEBHOOK_USERNAME !== '') {
-        baseMessageOptions.username = WEBHOOK_USERNAME;
-    }
-    if (WEBHOOK_AVATAR_URL !== "") {
-        baseMessageOptions.avatarURL = WEBHOOK_AVATAR_URL;
-    }
-    let mainMessageOptions = { ...baseMessageOptions };
+    let mainMessageOptions = { ...BASE_MESSAGE_OPTIONS };
+    mainMessageOptions.embeds = embeds;
     if (attachments.length > 0) {
         mainMessageOptions.files = attachments;
     }
@@ -174,7 +175,7 @@ async function run() {
             }
             attachments.push(new discord.AttachmentBuilder(video.path, { name: video.name }));
         }
-        let videoMessageOptions = { ...baseMessageOptions };
+        let videoMessageOptions = { ...BASE_MESSAGE_OPTIONS };
         videoMessageOptions.files = attachments;
         await webhook_client.send(videoMessageOptions);
     }
