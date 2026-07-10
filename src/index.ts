@@ -434,6 +434,9 @@ function getChangelogReplaceData(): Map<string, string>{
         ["fix:", ":tools:"]
     ]);
 
+    const raw = core.getInput('changelog_replace_data');
+    core.info(`raw type: ${typeof raw}, value: ${raw}`);
+
     let replaceData = JSON.parse(core.getInput("changelog_replace_data"));;
     if (replaceData !== '') {
         try {
