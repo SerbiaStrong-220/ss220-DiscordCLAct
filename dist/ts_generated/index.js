@@ -42,6 +42,7 @@ catch (e) {
     exit(1);
 }
 async function run() {
+    core.info(`WEBHOOK_URL: "${WEBHOOR_URL}"`);
     const webhook_client = new discord.WebhookClient({ url: WEBHOOR_URL });
     const git_client = github.getOctokit(GITHUB_TOKEN);
     core.info(`Attempt to send a GET-request to ${PR_URL}`);

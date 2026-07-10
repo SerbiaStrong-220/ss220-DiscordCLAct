@@ -50,6 +50,8 @@ try {
 }
 
 async function run(){
+    core.info(`WEBHOOK_URL: "${WEBHOOR_URL}"`);
+
     const webhook_client = new discord.WebhookClient({ url: WEBHOOR_URL });
     const git_client = github.getOctokit(GITHUB_TOKEN);
 
