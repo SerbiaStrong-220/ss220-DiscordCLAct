@@ -437,25 +437,23 @@ function getChangelogReplaceData(): Map<string, string>{
     const raw = core.getInput('changelog_replace_data');
     core.info(`raw type: ${typeof raw}, value: ${raw}`);
 
-    let replaceData = JSON.parse(core.getInput("changelog_replace_data"));;
-    if (replaceData !== '') {
-        try {
-            const parsed = JSON.parse(replaceData);
+    try {
+        const raw = core.getInput('changelog_replace_data');
+        if (raw) {
+            const parsed = JSON.parse(raw);
             if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
                 return new Map(Object.entries(parsed));
             } else {
-                throw new Error('Not a plain object');
+                throw new Error('Input must be a JSON object (not an array or null)');
             }
-        } catch (error) {
-            if (error instanceof Error){
-                core.warning(`Invalid changelog_replace_data, using default: ${error.message}`);
-            }
-
+        } else {
             return defaultReplaceData;
         }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        core.warning(`Invalid changelog_replace_data, using default: ${message}`);
+        return defaultReplaceData;
     }
-
-    return defaultReplaceData;
 }
 
 function getBaseMessageOptions(): discord.WebhookMessageCreateOptions{
