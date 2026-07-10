@@ -40,7 +40,6 @@ catch (e) {
     exit(1);
 }
 async function run() {
-    core.info(`WEBHOOK_URL: "${WEBHOOK_URL}"`);
     const webhook_client = new discord.WebhookClient({ url: WEBHOOK_URL });
     const git_client = github.getOctokit(GITHUB_TOKEN);
     core.info(`Attempt to send a GET-request to ${PR_URL}`);
@@ -272,13 +271,7 @@ async function getMedia(text) {
             return new MediaData(fileName, savePath, mediaType, size);
         }
         catch (e) {
-            let error;
-            if (e instanceof Error) {
-                error = e.message;
-            }
-            else {
-                error = 'Unknown error';
-            }
+            let error = e instanceof Error ? e.message : String(e);
             core.warning(`Download failed by error: ${error}`);
             return null;
         }
@@ -303,7 +296,7 @@ async function getMedia(text) {
                 let mediaType;
                 let contentType = res.headers['content-type'];
                 if (contentType === undefined) {
-                    return reject(`Unable to determine a media type`);
+                    return reject(new Error(`Unable to determine a media type`));
                 }
                 if (contentType.endsWith('/gif')) {
                     extension = 'gif';
@@ -317,8 +310,8 @@ async function getMedia(text) {
                     extension = contentType.split('/')[1].split(';')[0];
                     mediaType = MediaType.VIDEO;
                 }
-                if (extension === undefined || extension === null) {
-                    return reject(`Content-Type "${contentType}" is not supported!`);
+                if (extension === null) {
+                    return reject(new Error(`Content-Type "${contentType}" is not supported!`));
                 }
                 let data = [];
                 res.on('data', chunk => data.push(chunk));
@@ -361,8 +354,6 @@ function getChangelogReplaceData() {
         ["tweak:", ":gear:"],
         ["fix:", ":tools:"]
     ]);
-    const raw = core.getInput('changelog_replace_data');
-    core.info(`raw type: ${typeof raw}, value: ${raw}`);
     try {
         const raw = core.getInput('changelog_replace_data');
         if (raw) {

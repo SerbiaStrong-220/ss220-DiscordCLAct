@@ -47,8 +47,6 @@ try {
 }
 
 async function run(){
-    core.info(`WEBHOOK_URL: "${WEBHOOK_URL}"`);
-
     const webhook_client = new discord.WebhookClient({ url: WEBHOOK_URL });
     const git_client = github.getOctokit(GITHUB_TOKEN);
 
@@ -322,14 +320,7 @@ async function getMedia(text: string): Promise<Map<MediaType, MediaData[]>>{
             core.info(`Download successful`);
             return new MediaData(fileName, savePath, mediaType, size);
         } catch (e){
-            let error: string;
-            if (e instanceof Error){
-                error = e.message;
-            }
-            else{
-                error = 'Unknown error';
-            }
-
+            let error = e instanceof Error ? e.message : String(e);
             core.warning(`Download failed by error: ${error}`);
             return null;
         }
@@ -360,7 +351,7 @@ async function getMedia(text: string): Promise<Map<MediaType, MediaData[]>>{
                 let contentType = res.headers['content-type'];
 
                 if (contentType === undefined){
-                    return reject(`Unable to determine a media type`);
+                    return reject(new Error (`Unable to determine a media type`));
                 }
 
                 if (contentType.endsWith('/gif')){
@@ -376,8 +367,8 @@ async function getMedia(text: string): Promise<Map<MediaType, MediaData[]>>{
                     mediaType = MediaType.VIDEO;
                 }
 
-                if (extension === undefined || extension === null){
-                    return reject(`Content-Type "${contentType}" is not supported!`);
+                if (extension === null){
+                    return reject(new Error (`Content-Type "${contentType}" is not supported!`));
                 }
 
                 let data: Buffer[] = [];
@@ -430,9 +421,6 @@ function getChangelogReplaceData(): Map<string, string>{
         ["tweak:", ":gear:"],
         ["fix:", ":tools:"]
     ]);
-
-    const raw = core.getInput('changelog_replace_data');
-    core.info(`raw type: ${typeof raw}, value: ${raw}`);
 
     try {
         const raw = core.getInput('changelog_replace_data');
