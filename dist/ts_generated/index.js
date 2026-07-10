@@ -9,8 +9,6 @@ import * as crypto from 'crypto';
 const WEBHOOK_URL = core.getInput("webhook_url");
 const GITHUB_TOKEN = core.getInput("github_token");
 const PR_URL = core.getInput("pull_request_url");
-const WEBHOOK_USERNAME = core.getInput("webhook_username");
-const WEBHOOK_AVATAR_URL = core.getInput("webhook_avatar_url");
 const ATTACHMENT_COUNT_LIMIT = 10; // docs: https://discord.com/developers/docs/resources/message#create-message
 const ATTACHMENT_SIZE_LIMIT = 10 * 1024 * 1024; // docs: https://discord.com/developers/docs/resources/message#create-message
 const DIRECTORY_NAME = path.dirname(url.fileURLToPath(import.meta.url));
@@ -29,41 +27,9 @@ class MediaData {
         this.size = size;
     }
 }
-const rawReplaceData = JSON.parse(core.getInput("changelog_replace_data"));
-let CHANGELOG_REPLACE_DATA;
-const defaultReplaceData = new Map([
-    ["add:", ":newspaper: "],
-    ["remove:", ":scissors:"],
-    ["tweak:", ":gear:"],
-    ["fix:", ":tools:"]
-]);
-if (rawReplaceData !== '') {
-    try {
-        const parsed = JSON.parse(rawReplaceData);
-        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-            CHANGELOG_REPLACE_DATA = new Map(Object.entries(parsed));
-        }
-        else {
-            throw new Error('Not a plain object');
-        }
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            core.warning(`Invalid changelog_replace_data, using default: ${error.message}`);
-        }
-        CHANGELOG_REPLACE_DATA = defaultReplaceData;
-    }
-}
-else {
-    CHANGELOG_REPLACE_DATA = defaultReplaceData;
-}
-const BASE_MESSAGE_OPTIONS = {};
-if (WEBHOOK_USERNAME !== '') {
-    BASE_MESSAGE_OPTIONS.username = WEBHOOK_USERNAME;
-}
-if (WEBHOOK_AVATAR_URL !== "") {
-    BASE_MESSAGE_OPTIONS.avatarURL = WEBHOOK_AVATAR_URL;
-}
+const CHANGELOG_REPLACE_DATA = getChangelogReplaceData();
+const BASE_MESSAGE_OPTIONS = getBaseMessageOptions();
+const EMBED_COLOR = getEmbedColor();
 try {
     await run();
     exit(0);
@@ -107,7 +73,7 @@ async function run() {
     core.info('');
     let title = `#${pull_request.data.number}: ${pull_request.data.title}`;
     let mainEmbed = new discord.EmbedBuilder()
-        .setColor(0x3CB371)
+        .setColor(EMBED_COLOR)
         .setTitle(title)
         .setURL(html_url)
         .setDescription(`**${outputCLData.authors}**\n${outputCLData.infos}`);
@@ -389,4 +355,62 @@ function exit(code = undefined) {
         fs.rmSync(ATTACHMENT_SAVE_PATH, { recursive: true });
     }
     process.exit(code);
+}
+function getChangelogReplaceData() {
+    const defaultReplaceData = new Map([
+        ["add:", ":newspaper: "],
+        ["remove:", ":scissors:"],
+        ["tweak:", ":gear:"],
+        ["fix:", ":tools:"]
+    ]);
+    let replaceData = JSON.parse(core.getInput("changelog_replace_data"));
+    ;
+    if (replaceData !== '') {
+        try {
+            const parsed = JSON.parse(replaceData);
+            if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+                return new Map(Object.entries(parsed));
+            }
+            else {
+                throw new Error('Not a plain object');
+            }
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                core.warning(`Invalid changelog_replace_data, using default: ${error.message}`);
+            }
+            return defaultReplaceData;
+        }
+    }
+    return defaultReplaceData;
+}
+function getBaseMessageOptions() {
+    let options = {};
+    let username = core.getInput("webhook_username");
+    if (username !== '') {
+        BASE_MESSAGE_OPTIONS.username = username;
+    }
+    let avatarUrl = core.getInput("webhook_avatar_url");
+    if (avatarUrl !== '') {
+        BASE_MESSAGE_OPTIONS.avatarURL = avatarUrl;
+    }
+    return options;
+}
+function getEmbedColor() {
+    const defaultEmbedColor = 0x3CB371;
+    var color = core.getInput("webhook_embed_color");
+    if (color === '') {
+        return defaultEmbedColor;
+    }
+    let hex = color.trim();
+    if (hex.startsWith('#')) {
+        hex = hex.slice(1);
+    }
+    let parsed = parseInt(hex, 16);
+    if (!isNaN(parsed) && parsed >= 0 && parsed <= 0xFFFFFF) {
+        return parsed;
+    }
+    else {
+        return defaultEmbedColor;
+    }
 }
