@@ -13,7 +13,7 @@ const PR_URL = core.getInput("pull_request_url");
 
 const WEBHOOK_USERNAME = core.getInput("webhook_username");
 const WEBHOOK_AVATAR_URL = core.getInput("webhook_avatar_url");
-const CHANGELOG_REPLACE_DATA = JSON.parse(core.getInput("changelog_replace_data"));
+
 
 const ATTACHMENT_COUNT_LIMIT = 10; // docs: https://discord.com/developers/docs/resources/message#create-message
 const ATTACHMENT_SIZE_LIMIT = 10 * 1024 * 1024; // docs: https://discord.com/developers/docs/resources/message#create-message
@@ -35,6 +35,35 @@ class MediaData{
         public type: MediaType,
         public size: number){
     }
+}
+
+const rawReplaceData = JSON.parse(core.getInput("changelog_replace_data"));
+let CHANGELOG_REPLACE_DATA: Map<string, string>;
+
+const defaultReplaceData = new Map([
+    ["add:", ":newspaper: "],
+    ["remove:", ":scissors:"],
+    ["tweak:", ":gear:"],
+    ["fix:", ":tools:"]
+]);
+
+if (rawReplaceData !== '') {
+    try {
+        const parsed = JSON.parse(rawReplaceData);
+        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+            CHANGELOG_REPLACE_DATA = new Map(Object.entries(parsed));
+        } else {
+            throw new Error('Not a plain object');
+        }
+    } catch (error) {
+        if (error instanceof Error){
+            core.warning(`Invalid changelog_replace_data, using default: ${error.message}`);
+        }
+
+        CHANGELOG_REPLACE_DATA = defaultReplaceData;
+    }
+} else {
+    CHANGELOG_REPLACE_DATA = defaultReplaceData;
 }
 
 try {
